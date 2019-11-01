@@ -10,6 +10,7 @@ import Boost from 'highcharts/modules/boost';
 import noData from 'highcharts/modules/no-data-to-display';
 import More from 'highcharts/highcharts-more';
 import { BloodpressureMeasurement } from '@AutochekCommon/vanilla/objects/device-data-object';
+import { AutochekChartOption } from './chart.option';
 
 Boost(Highcharts);
 noData(Highcharts);
@@ -18,15 +19,15 @@ noData(Highcharts);
 
 
 
-export function drawBloodpressurePeriodChart(canvas: string, data:BloodpressureMeasurement[], start?: Date, end?: Date) {
+export function drawBloodpressurePeriodChart(canvas: string, data:BloodpressureMeasurement[], opt?:AutochekChartOption) {
   const bpData = data; 
-  const option = setBloodPressureOption(bpData, start, end);
+  const option = setBloodPressureOption(bpData, opt);
   Highcharts.chart(canvas, option);
 }
   
   
 
-function setBloodPressureOption(bpData: any, start?:Date, end?:Date) {
+function setBloodPressureOption(bpData: any, opt:AutochekChartOption) {
   const options: any = {
     title: {
     text: 'Blood Pressure chart'
@@ -121,11 +122,11 @@ options.series[0].data = updatedSystolic;
 options.series[1].data = updatedAverage;
     options.series[2].data = updatedRate;
     
-    if (start) {
-    options.xAxis.min = start.getTime();
+    if (opt.start) {
+    options.xAxis.min = opt.start.getTime();
 }
-if (end) {
-    options.xAxis.max = end.getTime();
+if (opt.end) {
+    options.xAxis.max = opt.end.getTime();
 }
 
 return options;
