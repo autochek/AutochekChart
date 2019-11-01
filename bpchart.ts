@@ -1,7 +1,7 @@
 import * as moment from 'moment'
 import MomentTimeZone from "moment-timezone";
 
-window['moment'] = moment
+window['moment'] = moment;
 MomentTimeZone();
 
 import * as Highcharts from 'highcharts';
@@ -16,8 +16,7 @@ noData(Highcharts);
 More(Highcharts);
 
 export function drawBloodpressurePeriodChart(canvas: string, data: BloodpressureMeasurement[], opt?: AutochekChartOption) {
-  const bpData = data;
-  const option = setBloodPressureOption(bpData, opt);
+  const option = setBloodPressureOption(data, opt);
   Highcharts.chart(canvas, option);
 }
 
@@ -35,7 +34,7 @@ Highcharts.setOptions({
   }
 });
 
-function setBloodPressureOption(bpData: any, opt: AutochekChartOption) {
+function setBloodPressureOption(bpData: BloodpressureMeasurement[], opt?: AutochekChartOption) {
   const options: any = {
     title: {
       text: 'Blood Pressure chart'
