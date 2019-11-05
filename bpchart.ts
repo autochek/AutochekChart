@@ -99,7 +99,7 @@ function setBloodPressureOption(bpData: BloodpressureMeasurement[], opt?: Autoch
       }
     },
     series: [{
-      name: '수축기',
+      name: '최대/최소 혈압',
       type: 'arearange',
       lineWidth: 1,
       fillOpacity: 0.3,
