@@ -4,20 +4,26 @@ import MomentTimeZone from "moment-timezone";
 window['moment'] = moment;
 MomentTimeZone();
 
+
+import {PedometerSleepSegment} from '@AutochekCommon/vanilla/objects/device-data-object';
+import {AutochekChartOption} from './chart.option';
+
 import * as Highcharts from 'highcharts';
 import Boost from 'highcharts/modules/boost';
 import noData from 'highcharts/modules/no-data-to-display';
 import More from 'highcharts/highcharts-more';
-import {PedometerSleepSegment} from '@AutochekCommon/vanilla/objects/device-data-object';
-import {AutochekChartOption} from './chart.option';
-
+import Xrange from 'highcharts/modules/xrange';
+Xrange(Highcharts);
 Boost(Highcharts);
 noData(Highcharts);
 More(Highcharts);
 
-async function drawSleepChart(canvas: string, data: PedometerSleepSegment[], opt?: AutochekChartOption) {
-  const options = await setSleepSegmentOption(data);
-  await Highcharts.chart(canvas, options);
+export function drawSleepChart(canvas: string, data: PedometerSleepSegment[], opt?: AutochekChartOption) {
+  setSleepSegmentOption(data).then(
+    (options)=>{
+      Highcharts.chart(canvas, options);
+    }
+  )
 }
 
 async function setSleepSegmentOption(sleepData: PedometerSleepSegment[]) {
@@ -112,7 +118,7 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[]) {
 
 async function makeSleepData(index: number, startTime: number, endTime: number, notInSleep, shallowSleep, deepSleep) {
   switch (index) {
-    case 1:
+    case 3:
       notInSleep.push({
         x: startTime,
         x2: endTime,
@@ -128,7 +134,7 @@ async function makeSleepData(index: number, startTime: number, endTime: number, 
         color: '#bcc5fa',
       });
       break;
-    case 3:
+    case 1:
       deepSleep.push({
         x: startTime,
         x2: endTime,

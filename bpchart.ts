@@ -70,8 +70,8 @@ function setBloodPressureOption(bpData: BloodpressureMeasurement[], opt?: Autoch
         text: '혈압',
         enabled: false
       },
-      min: 0,
-      max: 160,
+      min: 60,
+      max: 220,
       labels: {
         format: '{value}',
         padding: 2,
