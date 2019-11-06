@@ -58,10 +58,10 @@ function setBloodPressureOption(bpData: BloodpressureMeasurement[], opt?: Autoch
         enabled: false
       },
       dateTimeLabelFormats: {
-        minute: '%H시:%M분',
-        hour: '%H시:%M분',
-        day: '%b.%e',
-        week: '%b.%e',
+        minute: '%H:%M',
+        hour: '%H:%M',
+        day: '%b월 %e일',
+        week: '%b월 %e일',
         month: '%y년 %b월'
       }
     },

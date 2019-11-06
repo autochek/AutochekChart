@@ -13,6 +13,7 @@ import Boost from 'highcharts/modules/boost';
 import noData from 'highcharts/modules/no-data-to-display';
 import More from 'highcharts/highcharts-more';
 import Xrange from 'highcharts/modules/xrange';
+
 Xrange(Highcharts);
 Boost(Highcharts);
 noData(Highcharts);
@@ -20,7 +21,7 @@ More(Highcharts);
 
 export function drawSleepChart(canvas: string, data: PedometerSleepSegment[], opt?: AutochekChartOption) {
   setSleepSegmentOption(data).then(
-    (options)=>{
+    (options) => {
       Highcharts.chart(canvas, options);
     }
   )
@@ -38,7 +39,14 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[]) {
       timezone: 'Asia/Seoul'
     },
     xAxis: {
-      type: 'datetime'
+      type: 'datetime',
+      dateTimeLabelFormats: {
+        minute: '%H:%M',
+        hour: '%H:%M',
+        day: '%b월 %e일',
+        week: '%b월 %e일',
+        month: '%y년 %b월'
+      }
     },
     yAxis: {
       categories: ['수면패턴'],
@@ -51,6 +59,7 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[]) {
         borderRadius: 0,
         pointPadding: 0,
         groupPadding: 0,
+        colorByPoint: false,
         dataLabels: {
           enabled: true
         }
@@ -64,15 +73,18 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[]) {
     series: [
       {
         name: '안 잠',
-        data: []
+        data: [],
+        color: '#e5e9fd',
       },
       {
         name: '얕은잠',
-        data: []
+        data: [],
+        color: '#bcc5fa',
       },
       {
         name: '깊은잠',
-        data: []
+        data: [],
+        color: '#8191f5'
       }]
   };
 
@@ -122,24 +134,21 @@ async function makeSleepData(index: number, startTime: number, endTime: number, 
       notInSleep.push({
         x: startTime,
         x2: endTime,
-        y: 0,
-        color: '#e5e9fd',
+        y: 0
       });
       break;
     case 2:
       shallowSleep.push({
         x: startTime,
         x2: endTime,
-        y: 0,
-        color: '#bcc5fa',
+        y: 0
       });
       break;
     case 1:
       deepSleep.push({
         x: startTime,
         x2: endTime,
-        y: 0,
-        color: '#8191f5'
+        y: 0
       });
       break;
   }
