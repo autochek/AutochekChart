@@ -33,8 +33,8 @@ export async function drawHeartRateChart(canvas: string, data: PedometerHeartrat
   await Highcharts.chart(canvas, option);
 }
 
-async function setHeartRateChartOption(data: PedometerHeartrateSegment[]) {
-  const option: any = {
+async function setHeartRateChartOption(heartRateData: PedometerHeartrateSegment[]) {
+  const options: any = {
     title: {
       text: 'Heart Rate Chart'
     },
