@@ -53,22 +53,35 @@ async function setHeartRateChartOption(heartRateData: PedometerHeartrateSegment[
       }
     },
     yAxis: {
+      title:{
+        text: 'BPM(심박수/1분)',
+        rotation:'270'
+      },
       labels: {
-        format: '{value}bpm',
+        format: '{value}',
       }
     },
-    plotOptions: {},
+    plotOptions: {
+      series: {
+        animation: false,
+        marker: {
+          enabled: false
+        }
+      }
+    },
     series: [{
       name: '심박수',
-      type: 'spline',
+      type: 'line',
       color: Highcharts.getOptions().colors[0],
       data: []
     }]
   };
 
   heartRateData.forEach(data => {
-    const time = new Date(data.date).getTime();
-    options.series[0].data.push([time, data.rate]);
+    if (data.rate > 10) {
+      const time = new Date(data.date).getTime();
+      options.series[0].data.push([time, data.rate]);
+    }
   });
   // set xAxis min: first input data start of day  max: last input data end of day
   const startOfDay = moment(heartRateData[0].date).startOf('day').toDate()
