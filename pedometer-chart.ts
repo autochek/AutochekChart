@@ -1,5 +1,5 @@
-import * as moment from 'moment'
-import MomentTimeZone from "moment-timezone";
+import * as moment from 'moment';
+import MomentTimeZone from 'moment-timezone';
 
 window['moment'] = moment;
 MomentTimeZone();
@@ -15,18 +15,20 @@ Boost(Highcharts);
 noData(Highcharts);
 More(Highcharts);
 
-// export interface PedometerTimeSegment{
-//   date:Date,
-//   duration:number,
-//   step:number,
-//   cal:number,
-//   dist:number
-// }
-
-
 export function drawPedometerChart(canvas: string, data: PedometerTimeSegment[] | PedometerDaySummary[], opt?: AutochekChartOption) {
-  const option = setPedometerOption(data);
-  Highcharts.chart(canvas, option);
+  const PedoData = setPedometerData(data);
+  console.log(PedoData[0]);
+  console.log(PedoData[1]);
+  console.log(PedoData[2]);
+  PedoData.forEach((dataset, i) => {
+    const chartDiv = document.createElement('div');
+    chartDiv.className = 'chart';
+    document.getElementById(canvas).appendChild(chartDiv);
+    options.series[0].data = dataset;
+    options.yAxis.title.text = optionData[i].yAxisTitle;
+    options.title.text = optionData[i].title;
+    Highcharts.chart(chartDiv, options);
+  });
 }
 
 Highcharts.setOptions({
@@ -43,100 +45,73 @@ Highcharts.setOptions({
   }
 });
 
-// data type 두가지인데 어떻게 되는지.
-function setPedometerOption(pedoData: PedometerTimeSegment[] | PedometerDaySummary[]) {
-  const options: any = {
+const optionData = [
+  {title: '활동량', yAxisTitle: '걸음(보)'},
+  {title: '소모 칼로리', yAxisTitle: '칼로리(kcal)'},
+  {title: '이동거리', yAxisTitle: '거리(km)'}
+];
+
+const options: any = {
+  title: {
+    text: ''
+  },
+  credits: {
+    enabled: false
+  },
+  tooltip: {
+    shared: true
+  },
+  time: {
+    timezone: 'Asia/Seoul'
+  },
+  xAxis: {
+    type: 'datetime',
+    gridLineWidth: 1,
     title: {
-      text: '활동량 기록'
-    },
-    credits: {
+      text: '시간',
       enabled: false
     },
-    tooltip: {
-      shared: true
+    dateTimeLabelFormats: {
+      minute: '%H:%M',
+      hour: '%H:%M',
+      day: '%b월 %e일',
+      week: '%b월 %e일',
+      month: '%y년 %b월'
+    }
+  },
+  yAxis: {
+    title: {
+      text: ''
     },
-    time: {
-      timezone: 'Asia/Seoul'
-    },
-    xAxis: {
-      type: 'datetime',
-      gridLineWidth: 1,
-      startOnTick: true,
-      endOnTick: true,
-      title: {
-        text: '시간',
-        enabled: false
+    startOnTick: false,
+    endOnTick: false,
+    labels: {
+      format: '{value}',
+      padding: 2,
+      style: {
+        color: Highcharts.getOptions().colors[3]
+      }
+    }
+  },
+  plotOptions: {
+    series: {
+      showInLegend: false,
+      marker: {
+        enabled: true
       },
-      dateTimeLabelFormats: {
-        minute: '%H:%M',
-        hour: '%H:%M',
-        day: '%b월 %e일',
-        week: '%b월 %e일',
-        month: '%y년 %b월'
-      }
-    },
-    yAxis: [{
-      title: {
-        text: '걸음',
-        rotation: '270'
-      },
-      startOnTick: false,
-      endOnTick: false,
-      labels: {
-        format: '{value}',
-        padding: 2,
-        style: {
-          color: Highcharts.getOptions().colors[3]
-        }
-      }
-    }, {
-      gridLineWidth: 1,
-      opposite: true,
-      title: {
-        text: '이동거리(km)',
-        enabled: true,
-        rotation: 270
-      },
-      labels: {
-        format: '{value}',
-        align: 'left',
-      }
-    }],
-    plotOptions: {
-      series: {
-        marker: {
-          enabled: true
-        },
-      }
-    },
-    series: [{
-      name: '걸음',
-      lineWidth: 1,
-      color: Highcharts.getOptions().colors[3],
-      data: []
-    }, {
-      name: '소모 칼로리',
-      data: [],
-    }, {
-      name: '이동거리',
-      type: 'column',
-      yAxis: 1,
-      data: []
-    }]
-  };
+    }
+  },
+  series: [{
+    type: 'column',
+    data: []
+  }]
+};
 
-  //
-  // export interface PedometerDaySummary{
-  //   date:Date,
-  //   step:number,
-  //   cal:number,
-  //   dist:number
-  // }
-
+function setPedometerData(pedoData: PedometerTimeSegment[] | PedometerDaySummary[]) {
+  const rtnData = [];
   const step = [];
   const cal = [];
   const dist = [];
-
 
   pedoData.forEach((data) => {
     const timeAndDate = new Date(data.date).getTime();
@@ -154,9 +129,9 @@ function setPedometerOption(pedoData: PedometerTimeSegment[] | PedometerDaySumma
     dist.push(tempDist);
   });
 
-  options.series[0].data = step;
-  options.series[1].data = cal;
-  options.series[2].data = dist;
+  rtnData.push(step);
+  rtnData.push(cal);
+  rtnData.push(dist);
 
-  return options;
+  return rtnData;
 }
