@@ -16,17 +16,24 @@ noData(Highcharts);
 More(Highcharts);
 
 export function drawPedometerChart(canvas: string, data: PedometerTimeSegment[] | PedometerDaySummary[], opt?: AutochekChartOption) {
-  const PedoData = setPedometerData(data);
-  console.log(PedoData[0]);
-  console.log(PedoData[1]);
-  console.log(PedoData[2]);
-  PedoData.forEach((dataset, i) => {
+  const pedometerData = setPedometerData(data);
+  pedometerData.forEach((dataset, i) => {
     const chartDiv = document.createElement('div');
     chartDiv.className = 'chart';
     document.getElementById(canvas).appendChild(chartDiv);
     options.series[0].data = dataset;
-    options.yAxis.title.text = optionData[i].yAxisTitle;
     options.title.text = optionData[i].title;
+    options.tooltip.pointFormat = '{point.y} ' + optionData[i].unit;
+
+    if (opt.start) {
+      options.xAxis.min = opt.start.getTime();
+    }
+    if (opt.end) {
+      options.xAxis.max = opt.end.getTime();
+    }
+    if (data[0] instanceof PedometerTimeSegment) {
+      options.plotOptions.series.groupPadding = 0;
+    }
     Highcharts.chart(chartDiv, options);
   });
 }
@@ -41,14 +48,15 @@ Highcharts.setOptions({
     weekdays: [
       '일', '월', '화', '수', '목', '금', '토'
     ],
-    shortMonths: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+    shortMonths: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+    thousandsSep: ','
   }
 });
 
 const optionData = [
-  {title: '활동량', yAxisTitle: '걸음(보)'},
-  {title: '소모 칼로리', yAxisTitle: '칼로리(kcal)'},
-  {title: '이동거리', yAxisTitle: '거리(km)'}
+  {title: '활동량', yAxisTitle: '걸음(보)', unit: '보'},
+  {title: '소모 칼로리', yAxisTitle: '칼로리(kcal)', unit: 'kcal'},
+  {title: '이동거리', yAxisTitle: '거리(km)', unit: 'kcal'}
 ];
 
 const options: any = {
@@ -59,13 +67,16 @@ const options: any = {
     enabled: false
   },
   tooltip: {
-    shared: true
+    pointFormat: '{point.y}',
+    xDateFormat: '%b월 %e일'
   },
   time: {
     timezone: 'Asia/Seoul'
   },
   xAxis: {
     type: 'datetime',
+    startOnTick: false,
+    endOnTick: false,
     gridLineWidth: 1,
     title: {
       text: '시간',
@@ -88,9 +99,6 @@ const options: any = {
     labels: {
       format: '{value}',
       padding: 2,
-      style: {
-        color: Highcharts.getOptions().colors[3]
-      }
     }
   },
   plotOptions: {
@@ -99,6 +107,9 @@ const options: any = {
       marker: {
         enabled: true
       },
+      groupPadding: 0.05,
+      pointPadding: 0,
+      color: Highcharts.getOptions().colors[3]
     }
   },
   series: [{
@@ -112,23 +123,56 @@ function setPedometerData(pedoData: PedometerTimeSegment[] | PedometerDaySummary
   const step = [];
   const cal = [];
   const dist = [];
+  // 빈배열 일 때 조심해서 다뤄야 함 채크 필요
+  if (pedoData[0] instanceof PedometerTimeSegment) {
+    let timeCriteria = moment(pedoData[0].date).startOf('hour');
+    let dataSum = [0, 0, 0];
+    pedoData.forEach((data, i) => {
+      const timeAndDate = moment(data.date).startOf('hour');
+      const tempTime = new Date(timeCriteria.toDate()).getTime();
 
-  pedoData.forEach((data) => {
-    const timeAndDate = new Date(data.date).getTime();
-    const tempStep = [
-      timeAndDate, data.step
-    ];
-    const tempCal = [
-      timeAndDate, data.cal
-    ];
-    const tempDist = [
-      timeAndDate, data.dist
-    ];
-    step.push(tempStep);
-    cal.push(tempCal);
-    dist.push(tempDist);
-  });
+      // code 정리 가능할 것 같음.
+      if (timeCriteria.isSame(timeAndDate) && i !== pedoData.length - 1) {
+        dataSum[0] += data.step;
+        dataSum[1] += data.cal;
+        dataSum[2] += data.dist;
+      } else if (i !== pedoData.length - 1) {
+        step.push([tempTime, dataSum[0]]);
+        cal.push([tempTime, parseFloat(dataSum[1].toFixed(2))]);
+        dist.push([tempTime, parseFloat(dataSum[2].toFixed(2))]);
 
+        timeCriteria = timeAndDate;
+        dataSum = [data.step, data.cal, data.dist];
+
+        dataSum[0] += data.step;
+        dataSum[1] += data.cal;
+        dataSum[2] += data.dist;
+      }
+      if (i === pedoData.length - 1) {
+        dataSum[0] += data.step;
+        dataSum[1] += data.cal;
+        dataSum[2] += data.dist;
+
+        step.push([tempTime, dataSum[0]]);
+        cal.push([tempTime, parseFloat(dataSum[1].toFixed(2))]);
+        dist.push([tempTime, parseFloat(dataSum[2].toFixed(2))]);
+      }
+
+    });
+  } else {
+    pedoData.forEach((data) => {
+      const timeAndDate = new Date(data.date).getTime();
+      step.push([
+        timeAndDate, data.step
+      ]);
+      cal.push([
+        timeAndDate, data.cal
+      ]);
+      dist.push([
+        timeAndDate, data.dist
+      ]);
+    });
+  }
   rtnData.push(step);
   rtnData.push(cal);
   rtnData.push(dist);
