@@ -152,7 +152,7 @@ function getAverageGlucose(time, glucoseList, min?, max?) {
     x: time,
     y: 0,
     marker: {
-      fillColor: 'green'
+      enabled: false
     }
   };
   glucoseList.forEach(glucoseData => {
@@ -164,8 +164,10 @@ function getAverageGlucose(time, glucoseList, min?, max?) {
   rtn.y = parseFloat((average / count).toFixed(2));
   if (rtn.y > max) {
     rtn.marker.fillColor = 'red'; // Highcharts.getOptions.color[]
+    rtn.marker.enabled = true;
   } else if (rtn.y < min) {
     rtn.marker.fillColor = 'blue';
+    rtn.marker.enabled = true;
   }
   return rtn;
 }
