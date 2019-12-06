@@ -1,11 +1,11 @@
-import * as moment from 'moment'
-import MomentTimeZone from "moment-timezone";
+import * as moment from 'moment';
+import MomentTimeZone from 'moment-timezone';
 
 window['moment'] = moment;
 MomentTimeZone();
 
 
-import {PedometerSleepSegment} from '@AutochekCommon/vanilla/objects/device-data-object';
+import {PedometerSleepSegment, PedometerSleepSummary} from '@AutochekCommon/vanilla/objects/device-data-object';
 import {AutochekChartOption} from './chart.option';
 
 import * as Highcharts from 'highcharts';
@@ -19,15 +19,15 @@ Boost(Highcharts);
 noData(Highcharts);
 More(Highcharts);
 
-export function drawSleepChart(canvas: string, data: PedometerSleepSegment[], opt?: AutochekChartOption) {
+export function drawSleepChart(canvas: string, data: PedometerSleepSegment[] | PedometerSleepSummary[], opt?: AutochekChartOption) {
   setSleepSegmentOption(data).then(
     (options) => {
       Highcharts.chart(canvas, options);
     }
-  )
+  );
 }
 
-async function setSleepSegmentOption(sleepData: PedometerSleepSegment[]) {
+async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | PedometerSleepSummary[]) {
   const option: any = {
     chart: {
       type: 'xrange'
@@ -64,18 +64,28 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[]) {
           enabled: true
         }
       },
+      column: {
+        stacking: 'normal'
+      },
       series: {
         marker: {
           enabled: true
         }
       }
     },
-    series: [
-      {
-        name: '안 잠',
-        data: [],
-        color: '#e5e9fd',
-      },
+    series: []
+  };
+
+  const notInSleep = [];
+  const shallowSleep = [];
+  const deepSleep = [];
+
+  if (sleepData[0] instanceof PedometerSleepSegment) {
+    option.series = [{
+      name: '안 잠',
+      data: [],
+      color: '#e5e9fd',
+    },
       {
         name: '얕은잠',
         data: [],
@@ -85,45 +95,63 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[]) {
         name: '깊은잠',
         data: [],
         color: '#8191f5'
-      }]
-  };
+      }];
 
-  let flag: number = sleepData[0].sleepIndex;
-  let startTime: number = new Date(sleepData[0].date).getTime();
-  let endTime: number;
+    let flag: number = sleepData[0].sleepIndex;
+    let startTime: number = new Date(sleepData[0].date).getTime();
+    let endTime: number;
 
-  const notInSleep = [];
-  const shallowSleep = [];
-  const deepSleep = [];
+    for (let i = 1; i < sleepData.length; i++) {
+      const bool = sleepData[i].sleepIndex !== flag;
+      if (i !== (sleepData.length - 1)) {
+        if (bool) {
+          endTime = new Date(sleepData[i].date).getTime();
+          await makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
 
-  for (let i = 1; i < sleepData.length; i++) {
-    const bool = sleepData[i].sleepIndex !== flag;
-    if (i !== (sleepData.length - 1)) {
-      if (bool) {
-        endTime = new Date(sleepData[i].date).getTime();
-        await makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
-
-        startTime = new Date(sleepData[i].date).getTime();
-        flag = sleepData[i].sleepIndex;
-      }
-    } else {
-      if (!bool) {
-        endTime = new Date(sleepData[i].date).getTime() + 300 * 1000;
-        await makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
+          startTime = new Date(sleepData[i].date).getTime();
+          flag = sleepData[i].sleepIndex;
+        }
       } else {
-        endTime = new Date(sleepData[i].date).getTime();
-        await makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
-        startTime = endTime;
-        endTime = new Date(sleepData[i].date).getTime() + 300 * 1000;
-        flag = sleepData[i].sleepIndex;
-        await makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
+        if (!bool) {
+          endTime = new Date(sleepData[i].date).getTime() + 300 * 1000;
+          await makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
+        } else {
+          endTime = new Date(sleepData[i].date).getTime();
+          await makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
+          startTime = endTime;
+          endTime = new Date(sleepData[i].date).getTime() + 300 * 1000;
+          flag = sleepData[i].sleepIndex;
+          await makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
+        }
       }
     }
-  }
 
-  option.series[0].data = notInSleep;
-  option.series[1].data = shallowSleep;
-  option.series[2].data = deepSleep;
+    option.series[0].data = notInSleep;
+    option.series[1].data = shallowSleep;
+    option.series[2].data = deepSleep;
+  } else {
+    option.series = [
+      {
+        name: '얕은잠',
+        data: [],
+        color: '#bcc5fa',
+      },
+      {
+        name: '깊은잠',
+        data: [],
+        color: '#8191f5'
+      }];
+    sleepData.forEach(data => {
+      const thatDay = new Date(data.date).getTime();
+      deepSleep.push(thatDay, data.deepSleep);
+      shallowSleep.push(thatDay, data.lightSleep);
+    });
+
+    option.series[0].data = shallowSleep;
+    option.series[1].data = deepSleep;
+
+    option.chart.type = 'column';
+  }
 
   return option;
 }
