@@ -97,30 +97,31 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | Pedome
         color: '#8191f5'
       }];
 
-    let flag: number = sleepData[0].sleepIndex;
+    let flag: number = (sleepData[0] as PedometerSleepSegment).sleepIndex;
     let startTime: number = new Date(sleepData[0].date).getTime();
     let endTime: number;
 
-    for (let i = 1; i < sleepData.length; i++) {
-      const bool = sleepData[i].sleepIndex !== flag;
+    for (let i = 1; i < sleepData.length; i++) { // Data is of type PedometerSleepSegment
+      let sData:PedometerSleepSegment = sleepData[i] as PedometerSleepSegment;
+      const bool = sData.sleepIndex !== flag;
       if (i !== (sleepData.length - 1)) {
         if (bool) {
-          endTime = new Date(sleepData[i].date).getTime();
+          endTime = new Date(sData.date).getTime();
           await makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
 
-          startTime = new Date(sleepData[i].date).getTime();
-          flag = sleepData[i].sleepIndex;
+          startTime = new Date(sData.date).getTime();
+          flag = sData.sleepIndex;
         }
       } else {
         if (!bool) {
-          endTime = new Date(sleepData[i].date).getTime() + 300 * 1000;
+          endTime = new Date(sData.date).getTime() + 300 * 1000;
           await makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
         } else {
-          endTime = new Date(sleepData[i].date).getTime();
+          endTime = new Date(sData.date).getTime();
           await makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
           startTime = endTime;
-          endTime = new Date(sleepData[i].date).getTime() + 300 * 1000;
-          flag = sleepData[i].sleepIndex;
+          endTime = new Date(sData.date).getTime() + 300 * 1000;
+          flag = sData.sleepIndex;
           await makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
         }
       }
@@ -129,7 +130,7 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | Pedome
     option.series[0].data = notInSleep;
     option.series[1].data = shallowSleep;
     option.series[2].data = deepSleep;
-  } else {
+  } else { // Data is of type PedometerSleepSummary
     option.series = [
       {
         name: '얕은잠',

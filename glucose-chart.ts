@@ -17,7 +17,7 @@ More(Highcharts);
 
 export function drawGlucoseChart(canvas: string, data: GlucosemeterMeasurement[] | GlucosemeterDaySummary[], opt?: AutochekChartOption) {
   let chartOption = {};
-  if (opt.glucose) {
+  if (opt && opt.glucose) { //when opt is not given, even 'opt.glucose' will raise error
     const glucoseMinMaxOption = opt.glucose;
     chartOption = setGlucoseChartOption(data, glucoseMinMaxOption);
   } else {
@@ -126,6 +126,17 @@ function setGlucoseChartOption(glucoseData: GlucosemeterDaySummary[] | Glucoseme
   const oneDayAfterMeal = [];
   const oneDayBeforeSleep = [];
 
+  if(!glucoseOption){ // option is optional, but require on drawing. So make default value
+    glucoseOption = {
+      b_meal_min : 80,
+      b_meal_max : 130,
+      a_meal_min : 100,
+      a_meal_max : 200,
+      sleep_min : 90,
+      sleep_max : 140
+    }
+  }
+
   glucoseData.forEach(gData => {
     const mDate = new Date(gData.date).getTime();
     const beforeMeal = getAverageGlucose(mDate, [gData.morningBeforeMeal, gData.afternoonBeforeMeal, gData.eveningBeforeMeal],
@@ -152,7 +163,8 @@ function getAverageGlucose(time, glucoseList, min?, max?) {
     x: time,
     y: 0,
     marker: {
-      enabled: false
+      enabled: false,
+      fillColor: undefined
     }
   };
   glucoseList.forEach(glucoseData => {
