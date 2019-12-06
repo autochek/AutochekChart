@@ -4,6 +4,7 @@ export interface AutochekChartOption {
   min?: number;
   max?: number;
 
+  bodyScale?: string;
   glucose?: GlucoseOption;
 }
 
