@@ -97,7 +97,7 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | Pedome
         color: '#8191f5'
       }];
 
-    let flag: number = sleepData[0].sleepIndex;
+    let flag: number = (sleepData[0] as PedometerSleepSegment).sleepIndex;
     let startTime: number = new Date(sleepData[0].date).getTime();
     let endTime: number;
 
