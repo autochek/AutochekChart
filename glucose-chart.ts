@@ -152,7 +152,8 @@ function getAverageGlucose(time, glucoseList, min?, max?) {
     x: time,
     y: 0,
     marker: {
-      enabled: false
+      enabled: false,
+      fillColor: undefined
     }
   };
   glucoseList.forEach(glucoseData => {
