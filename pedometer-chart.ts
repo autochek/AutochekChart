@@ -15,22 +15,27 @@ Boost(Highcharts);
 noData(Highcharts);
 More(Highcharts);
 
-export function drawPedometerChart(canvas: string, data: PedometerTimeSegment[] | PedometerDaySummary[], opt?: AutochekChartOption) {
+export function drawPedometerChart(canvas: string, data: PedometerTimeSegment[] | PedometerDaySummary[], opt?: AutochekChartOption){
+  document.getElementById(canvas).innerHTML = "";
   const pedometerData = setPedometerData(data);
   pedometerData.forEach((dataset, i) => {
     const chartDiv = document.createElement('div');
     chartDiv.className = 'chart';
+    
     document.getElementById(canvas).appendChild(chartDiv);
     options.series[0].data = dataset;
     options.title.text = optionData[i].title;
     options.tooltip.pointFormat = '{point.y} ' + optionData[i].unit;
 
-    if (opt.start) {
-      options.xAxis.min = opt.start.getTime();
+    if(opt){
+      if (opt.start) {
+        options.xAxis.min = opt.start.getTime();
+      }
+      if (opt.end) {
+        options.xAxis.max = opt.end.getTime();
+      }
     }
-    if (opt.end) {
-      options.xAxis.max = opt.end.getTime();
-    }
+    
     if (data[0] instanceof PedometerTimeSegment) {
       options.plotOptions.series.groupPadding = 0;
     }
