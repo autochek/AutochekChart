@@ -78,8 +78,8 @@ function setHbA1COption(hbA1CData: HbA1C[]) {
     }]
   };
   hbA1CData.forEach(data => {
-    const time = data.date.getTable();
-    options.series[0].data.push([time, data.HbA1C]);
+    const time = data.date.getTime();
+    options.series[0].data.push([time, data.measurement]);
   });
 
   return options;
