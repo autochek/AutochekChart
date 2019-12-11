@@ -1,23 +1,22 @@
-import * as moment from 'moment';
 import MomentTimeZone from 'moment-timezone';
-
-// window['moment'] = moment;
-MomentTimeZone();
-
 import * as Highcharts from 'highcharts';
 import Boost from 'highcharts/modules/boost';
 import noData from 'highcharts/modules/no-data-to-display';
 import More from 'highcharts/highcharts-more';
 import {GlucosemeterDaySummary, GlucosemeterMeasurement} from '@AutochekCommon/vanilla/objects/device-data-object';
-import {AutochekChartOption, GlucoseOption} from './chart.option';
+import {AutochekChartOption, chartCommon, GlucoseOption} from './chart.option';
+
+// window['moment'] = moment;
+MomentTimeZone();
 
 Boost(Highcharts);
 noData(Highcharts);
 More(Highcharts);
+chartCommon()
 
 export function drawGlucoseChart(canvas: string, data: GlucosemeterMeasurement[] | GlucosemeterDaySummary[], opt?: AutochekChartOption) {
   let chartOption = {};
-  if (opt && opt.glucose) { //when opt is not given, even 'opt.glucose' will raise error
+  if (opt && opt.glucose) { // when opt is not given, even 'opt.glucose' will raise error
     const glucoseMinMaxOption = opt.glucose;
     chartOption = setGlucoseChartOption(data, glucoseMinMaxOption);
   } else {
@@ -26,26 +25,11 @@ export function drawGlucoseChart(canvas: string, data: GlucosemeterMeasurement[]
   Highcharts.chart(canvas, chartOption);
 }
 
-Highcharts.setOptions({
-  lang: {
-    months: [
-      '1', '2', '3', '4',
-      '5', '6', '7', '8',
-      '9', '10', '11', '12'
-    ],
-    weekdays: [
-      '일', '월', '화', '수', '목', '금', '토'
-    ],
-    shortMonths: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
-    thousandsSep: ','
-  }
-});
-
 const options: any = {
   title: {
     text: '일평균 혈당 그래프'
   },
-  credits: {
+  credits: { // 밑 Highcharts 링크
     enabled: false
   },
   tooltip: {
@@ -64,13 +48,6 @@ const options: any = {
     title: {
       text: '시간',
       enabled: false
-    },
-    dateTimeLabelFormats: {
-      minute: '%H:%M',
-      hour: '%H:%M',
-      day: '%b월 %e일',
-      week: '%b월 %e일',
-      month: '%y년 %b월'
     }
   },
   yAxis: {
@@ -98,7 +75,8 @@ const options: any = {
       showInLegend: true,
       marker: {
         enabled: true
-      }
+      },
+      connectNulls: true
     }
   },
   series: [{
@@ -126,15 +104,15 @@ function setGlucoseChartOption(glucoseData: GlucosemeterDaySummary[] | Glucoseme
   const oneDayAfterMeal = [];
   const oneDayBeforeSleep = [];
 
-  if(!glucoseOption){ // option is optional, but require on drawing. So make default value
+  if (!glucoseOption) { // option is optional, but require on drawing. So make default value
     glucoseOption = {
-      b_meal_min : 80,
-      b_meal_max : 130,
-      a_meal_min : 100,
-      a_meal_max : 200,
-      sleep_min : 90,
-      sleep_max : 140
-    }
+      b_meal_min: 80,
+      b_meal_max: 130,
+      a_meal_min: 100,
+      a_meal_max: 200,
+      sleep_min: 90,
+      sleep_max: 140
+    };
   }
 
   glucoseData.forEach(gData => {

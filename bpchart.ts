@@ -1,38 +1,19 @@
-import * as moment from 'moment'
-import MomentTimeZone from "moment-timezone";
-
-window['moment'] = moment;
-MomentTimeZone();
-
 import * as Highcharts from 'highcharts';
 import Boost from 'highcharts/modules/boost';
 import noData from 'highcharts/modules/no-data-to-display';
 import More from 'highcharts/highcharts-more';
 import {BloodpressureMeasurement} from '@AutochekCommon/vanilla/objects/device-data-object';
-import {AutochekChartOption} from './chart.option';
+import {AutochekChartOption, chartCommon} from './chart.option';
 
 Boost(Highcharts);
 noData(Highcharts);
 More(Highcharts);
+chartCommon();
 
 export function drawBloodpressurePeriodChart(canvas: string, data: BloodpressureMeasurement[], opt?: AutochekChartOption) {
   const option = setBloodPressureOption(data, opt);
   Highcharts.chart(canvas, option);
 }
-
-Highcharts.setOptions({
-  lang: {
-    months: [
-      '1', '2', '3', '4',
-      '5', '6', '7', '8',
-      '9', '10', '11', '12'
-    ],
-    weekdays: [
-      '일', '월', '화', '수', '목', '금', '토'
-    ],
-    shortMonths: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
-  }
-});
 
 function setBloodPressureOption(bpData: BloodpressureMeasurement[], opt?: AutochekChartOption) {
   const options: any = {
@@ -56,13 +37,6 @@ function setBloodPressureOption(bpData: BloodpressureMeasurement[], opt?: Autoch
       title: {
         text: '시간',
         enabled: false
-      },
-      dateTimeLabelFormats: {
-        minute: '%H:%M',
-        hour: '%H:%M',
-        day: '%b월 %e일',
-        week: '%b월 %e일',
-        month: '%y년 %b월'
       }
     },
     yAxis: [{
@@ -153,7 +127,7 @@ function setBloodPressureOption(bpData: BloodpressureMeasurement[], opt?: Autoch
     options.xAxis.max = opt.end.getTime();
   }
   if (opt.max) {
-    options.yAxis.max = opt.max
+    options.yAxis.max = opt.max;
   }
 
   return options;

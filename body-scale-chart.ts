@@ -2,31 +2,18 @@ import * as Highcharts from 'highcharts';
 import Boost from 'highcharts/modules/boost';
 import noData from 'highcharts/modules/no-data-to-display';
 import More from 'highcharts/highcharts-more';
-import {AutochekChartOption} from './chart.option';
+import {AutochekChartOption, chartCommon} from './chart.option';
 import {BodyscaleMeasurement} from '@AutochekCommon/vanilla/objects/device-data-object';
 
 Boost(Highcharts);
 noData(Highcharts);
 More(Highcharts);
+chartCommon();
 
 export function drawBodyScaleChart(canvas: string, data: BodyscaleMeasurement[], opt?: AutochekChartOption) {
   const option = setBodyScaleOption(data, opt);
   Highcharts.chart(canvas, option);
 }
-
-Highcharts.setOptions({
-  lang: {
-    months: [
-      '1', '2', '3', '4',
-      '5', '6', '7', '8',
-      '9', '10', '11', '12'
-    ],
-    weekdays: [
-      '일', '월', '화', '수', '목', '금', '토'
-    ],
-    shortMonths: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
-  }
-});
 
 const options: any = {
   title: {
@@ -47,13 +34,6 @@ const options: any = {
     title: {
       text: '날짜',
       enabled: false
-    },
-    dateTimeLabelFormats: {
-      minute: '%H:%M',
-      hour: '%H:%M',
-      day: '%b월 %e일',
-      week: '%b월 %e일',
-      month: '%y년 %b월'
     }
   },
   yAxis: [{

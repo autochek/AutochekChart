@@ -1,33 +1,33 @@
 import * as moment from 'moment';
 import MomentTimeZone from 'moment-timezone';
-
-window['moment'] = moment;
-MomentTimeZone();
-
 import * as Highcharts from 'highcharts';
 import Boost from 'highcharts/modules/boost';
 import noData from 'highcharts/modules/no-data-to-display';
 import More from 'highcharts/highcharts-more';
 import {PedometerDaySummary, PedometerTimeSegment} from '@AutochekCommon/vanilla/objects/device-data-object';
-import {AutochekChartOption} from './chart.option';
+import {AutochekChartOption, chartCommon} from './chart.option';
+
+window['moment'] = moment;
+MomentTimeZone();
 
 Boost(Highcharts);
 noData(Highcharts);
 More(Highcharts);
+chartCommon();
 
-export function drawPedometerChart(canvas: string, data: PedometerTimeSegment[] | PedometerDaySummary[], opt?: AutochekChartOption){
-  document.getElementById(canvas).innerHTML = "";
+export function drawPedometerChart(canvas: string, data: PedometerTimeSegment[] | PedometerDaySummary[], opt?: AutochekChartOption) {
+  document.getElementById(canvas).innerHTML = '';
   const pedometerData = setPedometerData(data);
   pedometerData.forEach((dataset, i) => {
     const chartDiv = document.createElement('div');
     chartDiv.className = 'chart';
-    
+
     document.getElementById(canvas).appendChild(chartDiv);
     options.series[0].data = dataset;
     options.title.text = optionData[i].title;
     options.tooltip.pointFormat = '{point.y} ' + optionData[i].unit;
 
-    if(opt){
+    if (opt) {
       if (opt.start) {
         options.xAxis.min = opt.start.getTime();
       }
@@ -35,28 +35,13 @@ export function drawPedometerChart(canvas: string, data: PedometerTimeSegment[] 
         options.xAxis.max = opt.end.getTime();
       }
     }
-    
+
     if (data[0] instanceof PedometerTimeSegment) {
       options.plotOptions.series.groupPadding = 0;
     }
     Highcharts.chart(chartDiv, options);
   });
 }
-
-Highcharts.setOptions({
-  lang: {
-    months: [
-      '1', '2', '3', '4',
-      '5', '6', '7', '8',
-      '9', '10', '11', '12'
-    ],
-    weekdays: [
-      '일', '월', '화', '수', '목', '금', '토'
-    ],
-    shortMonths: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
-    thousandsSep: ','
-  }
-});
 
 const optionData = [
   {title: '활동량', yAxisTitle: '걸음(보)', unit: '보'},
@@ -87,13 +72,6 @@ const options: any = {
       text: '시간',
       enabled: false
     },
-    dateTimeLabelFormats: {
-      minute: '%H:%M',
-      hour: '%H:%M',
-      day: '%b월 %e일',
-      week: '%b월 %e일',
-      month: '%y년 %b월'
-    }
   },
   yAxis: {
     title: {

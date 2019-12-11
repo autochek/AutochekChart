@@ -1,11 +1,12 @@
-import * as moment from 'moment'
-import MomentTimeZone from "moment-timezone";
+import * as moment from 'moment';
+import MomentTimeZone from 'moment-timezone';
 import {PedometerHeartrateSegment} from '@AutochekCommon/vanilla/objects/device-data-object';
 
 import * as Highcharts from 'highcharts';
 import Boost from 'highcharts/modules/boost';
 import noData from 'highcharts/modules/no-data-to-display';
 import More from 'highcharts/highcharts-more';
+import {chartCommon} from '@AutochekChart/chart.option';
 
 window['moment'] = moment;
 MomentTimeZone();
@@ -13,20 +14,7 @@ MomentTimeZone();
 Boost(Highcharts);
 noData(Highcharts);
 More(Highcharts);
-
-Highcharts.setOptions({
-  lang: {
-    months: [
-      '1', '2', '3', '4',
-      '5', '6', '7', '8',
-      '9', '10', '11', '12'
-    ],
-    weekdays: [
-      '일', '월', '화', '수', '목', '금', '토'
-    ],
-    shortMonths: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
-  }
-});
+chartCommon();
 
 export async function drawHeartRateChart(canvas: string, data: PedometerHeartrateSegment[]) {
   const option = await setHeartRateChartOption(data);
@@ -44,18 +32,11 @@ async function setHeartRateChartOption(heartRateData: PedometerHeartrateSegment[
     xAxis: {
       type: 'datetime',
       gridLineWidth: 1,
-      dateTimeLabelFormats: {
-        minute: '%H시:%M분',
-        hour: '%H시:%M분',
-        day: '%b월 %e일',
-        week: '%b월 %e일',
-        month: '%y년 %b월'
-      }
     },
     yAxis: {
-      title:{
+      title: {
         text: 'BPM(심박수/1분)',
-        rotation:'270'
+        rotation: '270'
       },
       labels: {
         format: '{value}',
@@ -84,8 +65,8 @@ async function setHeartRateChartOption(heartRateData: PedometerHeartrateSegment[
     }
   });
   // set xAxis min: first input data start of day  max: last input data end of day
-  const startOfDay = moment(heartRateData[0].date).startOf('day').toDate()
-  const endOfDay = moment(heartRateData[heartRateData.length - 1].date).endOf('day').toDate()
+  const startOfDay = moment(heartRateData[0].date).startOf('day').toDate();
+  const endOfDay = moment(heartRateData[heartRateData.length - 1].date).endOf('day').toDate();
   options.xAxis.min = startOfDay.getTime();
   options.xAxis.max = endOfDay.getTime();
 

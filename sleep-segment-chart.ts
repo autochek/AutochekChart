@@ -1,12 +1,5 @@
-import * as moment from 'moment';
-import MomentTimeZone from 'moment-timezone';
-
-window['moment'] = moment;
-MomentTimeZone();
-
-
 import {PedometerSleepSegment, PedometerSleepSummary} from '@AutochekCommon/vanilla/objects/device-data-object';
-import {AutochekChartOption} from './chart.option';
+import {AutochekChartOption, chartCommon} from './chart.option';
 
 import * as Highcharts from 'highcharts';
 import Boost from 'highcharts/modules/boost';
@@ -18,6 +11,7 @@ Xrange(Highcharts);
 Boost(Highcharts);
 noData(Highcharts);
 More(Highcharts);
+chartCommon();
 
 export function drawSleepChart(canvas: string, data: PedometerSleepSegment[] | PedometerSleepSummary[], opt?: AutochekChartOption) {
   setSleepSegmentOption(data).then(
@@ -40,13 +34,6 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | Pedome
     },
     xAxis: {
       type: 'datetime',
-      dateTimeLabelFormats: {
-        minute: '%H:%M',
-        hour: '%H:%M',
-        day: '%b월 %e일',
-        week: '%b월 %e일',
-        month: '%y년 %b월'
-      }
     },
     yAxis: {
       categories: ['수면패턴'],
@@ -102,7 +89,7 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | Pedome
     let endTime: number;
 
     for (let i = 1; i < sleepData.length; i++) { // Data is of type PedometerSleepSegment
-      let sData:PedometerSleepSegment = sleepData[i] as PedometerSleepSegment;
+      const sData: PedometerSleepSegment = sleepData[i] as PedometerSleepSegment;
       const bool = sData.sleepIndex !== flag;
       if (i !== (sleepData.length - 1)) {
         if (bool) {
