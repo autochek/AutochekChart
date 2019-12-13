@@ -19,6 +19,9 @@ const options: any = {
   title: {
     text: '체성분 차트'
   },
+  chart:{
+    type: 'column'
+  },
   credits: {
     enabled: false
   },
@@ -48,7 +51,8 @@ const options: any = {
   plotOptions: {
     series: {
       marker: {
-        enabled: true
+        enabled: true,
+        animation: false
       },
     },
     column: {
@@ -68,6 +72,12 @@ function setBodyScaleOption(bodyScaleData: BodyscaleMeasurement[], opt?: Autoche
   const fat = [];
 
   const selection = opt.bodyScale;
+  if (opt && opt.start) {
+    options.xAxis.min = opt.start.getTime()
+  }
+  if (opt && opt.end) {
+    options.xAxis.max = opt.end.getTime()
+  }
   switch (selection) {
     case 'weight':
       options.series = [{
@@ -93,9 +103,9 @@ function setBodyScaleOption(bodyScaleData: BodyscaleMeasurement[], opt?: Autoche
       bodyScaleData.forEach(data => {
         const dateAndTime = data.date.getTime();
 
-        const tempMuscle = parseFloat((data.weight * data.muscle).toFixed(2));
-        const tempFat = parseFloat((data.weight * data.fat).toFixed(2));
-        const tempWater = parseFloat((data.weight - tempMuscle - tempFat).toFixed(2));
+        const tempFat = parseFloat((data.weight * data.fat / 100).toFixed(2));
+        const tempWater = parseFloat((data.weight * data.water / 100).toFixed(2));
+        const tempMuscle = parseFloat((data.weight - tempFat - tempWater).toFixed(2));
 
         weight.push([dateAndTime, data.weight]);
         water.push([dateAndTime, tempWater]);
@@ -116,16 +126,20 @@ function setBodyScaleOption(bodyScaleData: BodyscaleMeasurement[], opt?: Autoche
       let multiplier = 1;
       if (opt.bodyScale === 'bmr') {
         options.series[0].name = '기초대사량';
+        options.title.text = "기초대사량"
       } else if (opt.bodyScale === 'visceral') {
         options.chart.type = 'line';
         options.series[0].name = '복부지방량';
+        options.title.text = "복부지방량"
         multiplier = 0.1;
       } else if (opt.bodyScale === 'bone') {
         options.series[0].name = '뼈/무기질';
+        options.title.text = "뼈/무기질"
         multiplier = 0.1;
       } else if (opt.bodyScale === 'bmi') {
         options.chart.type = 'line';
         options.series[0].name = '체질량 지수';
+        options.title.text = "체질량 지수"
       }
       bodyScaleData.forEach(data => {
         const dateAndTime = data.date.getTime();
