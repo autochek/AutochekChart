@@ -46,7 +46,7 @@ export function drawPedometerChart(canvas: string, data: PedometerTimeSegment[] 
 const optionData = [
   {title: '활동량', yAxisTitle: '걸음(보)', unit: '보'},
   {title: '소모 칼로리', yAxisTitle: '칼로리(kcal)', unit: 'kcal'},
-  {title: '이동거리', yAxisTitle: '거리(km)', unit: 'kcal'}
+  {title: '이동거리', yAxisTitle: '거리(m)', unit: 'm'}
 ];
 
 const options: any = {
@@ -146,13 +146,13 @@ function setPedometerData(pedoData: PedometerTimeSegment[] | PedometerDaySummary
     pedoData.forEach((data) => {
       const timeAndDate = new Date(data.date).getTime();
       step.push([
-        timeAndDate, data.step
+        timeAndDate, parseFloat(data.step.toFixed(2))
       ]);
       cal.push([
-        timeAndDate, data.cal
+        timeAndDate, parseFloat(data.cal.toFixed(2))
       ]);
       dist.push([
-        timeAndDate, data.dist
+        timeAndDate, parseFloat(data.dist.toFixed(2))
       ]);
     });
   }
