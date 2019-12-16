@@ -6,17 +6,10 @@ chartCommon(Highcharts);
 
 export function drawGlucoseChart(canvas: string, data: GlucosemeterMeasurement[] | GlucosemeterDaySummary[], opt?: AutochekChartOption) {
   let chartOption = {};
-  if (opt && opt.glucose) { // when opt is not given, even 'opt.glucose' will raise error
-    const glucoseMinMaxOption = opt.glucose;
-    chartOption = setGlucoseChartOption(data, glucoseMinMaxOption);
+  if (opt) { // when opt is not given, even 'opt.glucose' will raise error
+    chartOption = setGlucoseChartOption(data, opt);
   } else {
     chartOption = setGlucoseChartOption(data);
-  }
-  if (opt && opt.start) {
-    chartOption.xAxis.min = opt.start.getTime()
-  }
-  if (opt && opt.end) {
-    chartOption.xAxis.max = opt.end.getTime()
   }
   Highcharts.chart(canvas, chartOption);
 }
@@ -31,7 +24,8 @@ const options: any = {
   tooltip: {
     pointFormat: '<br>{series.name}: {point.y}mg/gL</br>',
     xDateFormat: '%b월 %e일',
-    shared: true
+    shared: true,
+    crosshairs: true
   },
   time: {
     timezone: 'Asia/Seoul'
@@ -78,7 +72,7 @@ const options: any = {
   series: []
 };
 
-function setGlucoseChartOption(glucoseData: GlucosemeterDaySummary[] | GlucosemeterMeasurement[], glucoseOption?: GlucoseOption) {
+function setGlucoseChartOption(glucoseData: GlucosemeterDaySummary[] | GlucosemeterMeasurement[], opt?: AutochekChartOption) {
   if (glucoseData[0] instanceof GlucosemeterDaySummary) {
     options.series = [{
       name: '식사 전 일평균',
@@ -108,8 +102,8 @@ function setGlucoseChartOption(glucoseData: GlucosemeterDaySummary[] | Glucoseme
     const oneDayAfterMeal = [];
     const oneDayBeforeSleep = [];
 
-    if (!glucoseOption) { // option is optional, but require on drawing. So make default value
-      glucoseOption = {
+    if (!opt && !opt.glucose) { // option is optional, but require on drawing. So make default value
+      opt.glucose = {
         b_meal_min: 80,
         b_meal_max: 130,
         a_meal_min: 100,
@@ -122,10 +116,10 @@ function setGlucoseChartOption(glucoseData: GlucosemeterDaySummary[] | Glucoseme
     glucoseData.forEach(gData => {
       const mDate = new Date(gData.date).getTime();
       const beforeMeal = getAverageGlucose(mDate, [gData.morningBeforeMeal, gData.afternoonBeforeMeal, gData.eveningBeforeMeal],
-        glucoseOption.b_meal_min, glucoseOption.b_meal_max);
+        opt.glucose.b_meal_min, opt.glucose.b_meal_max);
       const afterMeal = getAverageGlucose(mDate, [gData.morningAfterMeal, gData.afternoonAfterMeal, gData.eveningAfterMeal],
-        glucoseOption.a_meal_min, glucoseOption.a_meal_max);
-      const beforeSleep = getAverageGlucose(mDate, [gData.beforeSleep], glucoseOption.sleep_min, glucoseOption.sleep_max);
+        opt.glucose.a_meal_min, opt.glucose.a_meal_max);
+      const beforeSleep = getAverageGlucose(mDate, [gData.beforeSleep], opt.glucose.sleep_min, opt.glucose.sleep_max);
       oneDayBeforeMeal.push(beforeMeal);
       oneDayAfterMeal.push(afterMeal);
       oneDayBeforeSleep.push(beforeSleep);
@@ -143,11 +137,10 @@ function setGlucoseChartOption(glucoseData: GlucosemeterDaySummary[] | Glucoseme
     options.series = [{
       type: 'column',
       name: '혈당',
-      data: []
+      data: [],
+      opacity: 0.8,
+      borderWidth: 3
     }];
-
-    let temp = [];
-
     glucoseData.forEach(data => {
       let sTemp = '';
       if (data.timeofday === 'breakfast') {
@@ -166,14 +159,17 @@ function setGlucoseChartOption(glucoseData: GlucosemeterDaySummary[] | Glucoseme
         if (data.timeofday !== 'sleep')
           sTemp += '식후'
       }
-
-      temp.push([sTemp, data.measurement])
+      const pushData = [sTemp, data.measurement];
+      pushToOptionSeries(pushData, options, 0)
     });
-
-    options.series[0].data = temp
-    // 하루엥 여러번 측정 할 가능성 농후하지 않나? 그럴 때 각 각 포지션에 대해서 그냥 기록만 해 주면 상관없는데
   }
 
+  if (opt && opt.start) {
+    options.xAxis.min = opt.start.getTime()
+  }
+  if (opt && opt.end) {
+    options.xAxis.max = opt.end.getTime()
+  }
 
   return options;
 }
@@ -204,4 +200,25 @@ function getAverageGlucose(time, glucoseList, min?, max?) {
     rtn.marker.enabled = true;
   }
   return rtn;
+}
+
+function pushToOptionSeries(data, list, i) {
+  let hasSameCategory = false;
+  list.series[i].data.forEach(el => {
+    if (el[0] === data[0]) {
+      hasSameCategory = true
+    }
+  });
+  if (!hasSameCategory) {
+    list.series[i].data.push(data)
+  } else {
+    list.series.push({
+      type: 'column',
+      name: '혈당',
+      data: [],
+      opacity: 0.8,
+      borderWidth: 3
+    });
+    pushToOptionSeries(data, list, i + 1)
+  }
 }
