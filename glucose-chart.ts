@@ -12,6 +12,12 @@ export function drawGlucoseChart(canvas: string, data: GlucosemeterMeasurement[]
   } else {
     chartOption = setGlucoseChartOption(data);
   }
+  if (opt && opt.start) {
+    chartOption.xAxis.min = opt.start.getTime()
+  }
+  if (opt && opt.end) {
+    chartOption.xAxis.max = opt.end.getTime()
+  }
   Highcharts.chart(canvas, chartOption);
 }
 
@@ -23,7 +29,7 @@ const options: any = {
     enabled: false
   },
   tooltip: {
-    pointFormat: '<br>{series.name}: {point.y}mg/dl </br>',
+    pointFormat: '<br>{series.name}: {point.y}mg/gL</br>',
     xDateFormat: '%b월 %e일',
     shared: true
   },
@@ -69,57 +75,105 @@ const options: any = {
       connectNulls: true
     }
   },
-  series: [{
-    name: '식사 전 일평균',
-    type: 'line',
-    color: '#dddddd',
-    data: [],
-    lineWidth: 2.3
-  }, {
-    name: '식사 후 일평균',
-    type: 'line',
-    color: '#888888',
-    data: []
-  }, {
-    name: '취침 전',
-    type: 'line',
-    color: '#111111',
-    data: [],
-    lineWidth: 0.5
-  }]
+  series: []
 };
 
 function setGlucoseChartOption(glucoseData: GlucosemeterDaySummary[] | GlucosemeterMeasurement[], glucoseOption?: GlucoseOption) {
-  const oneDayBeforeMeal = [];
-  const oneDayAfterMeal = [];
-  const oneDayBeforeSleep = [];
+  if (glucoseData[0] instanceof GlucosemeterDaySummary) {
+    options.series = [{
+      name: '식사 전 일평균',
+      type: 'line',
+      color: '#dddddd',
+      data: [],
+      lineWidth: 2.3
+    }, {
+      name: '식사 후 일평균',
+      type: 'line',
+      color: '#888888',
+      data: []
+    }, {
+      name: '취침 전',
+      type: 'line',
+      color: '#111111',
+      data: [],
+      lineWidth: 0.5
+    }];
 
-  if (!glucoseOption) { // option is optional, but require on drawing. So make default value
-    glucoseOption = {
-      b_meal_min: 80,
-      b_meal_max: 130,
-      a_meal_min: 100,
-      a_meal_max: 200,
-      sleep_min: 90,
-      sleep_max: 140
-    };
+    options.xAxis.type = 'datetime';
+    options.xAxis.categories = undefined;
+    options.xAxis.max = undefined
+    options.xAxis.min = undefined
+
+    const oneDayBeforeMeal = [];
+    const oneDayAfterMeal = [];
+    const oneDayBeforeSleep = [];
+
+    if (!glucoseOption) { // option is optional, but require on drawing. So make default value
+      glucoseOption = {
+        b_meal_min: 80,
+        b_meal_max: 130,
+        a_meal_min: 100,
+        a_meal_max: 200,
+        sleep_min: 90,
+        sleep_max: 140
+      };
+    }
+
+    glucoseData.forEach(gData => {
+      const mDate = new Date(gData.date).getTime();
+      const beforeMeal = getAverageGlucose(mDate, [gData.morningBeforeMeal, gData.afternoonBeforeMeal, gData.eveningBeforeMeal],
+        glucoseOption.b_meal_min, glucoseOption.b_meal_max);
+      const afterMeal = getAverageGlucose(mDate, [gData.morningAfterMeal, gData.afternoonAfterMeal, gData.eveningAfterMeal],
+        glucoseOption.a_meal_min, glucoseOption.a_meal_max);
+      const beforeSleep = getAverageGlucose(mDate, [gData.beforeSleep], glucoseOption.sleep_min, glucoseOption.sleep_max);
+      oneDayBeforeMeal.push(beforeMeal);
+      oneDayAfterMeal.push(afterMeal);
+      oneDayBeforeSleep.push(beforeSleep);
+    });
+
+    options.series[0].data = oneDayBeforeMeal;
+    options.series[1].data = oneDayAfterMeal;
+    options.series[2].data = oneDayBeforeSleep;
+  } else {
+    options.xAxis.type = 'category'
+    options.xAxis.categories = ['아침 식전', '아침 식후', '점심 식전', '점심 식후', '저녁 식전', '저녁 식후', '취침 전'];
+    options.xAxis.min = 0;
+    options.xAxis.max = 6;
+
+    options.series = [{
+      type: 'column',
+      name: '혈당',
+      data: []
+    }];
+
+    let temp = [];
+
+    glucoseData.forEach(data => {
+      let sTemp = '';
+      if (data.timeofday === 'breakfast') {
+        sTemp += '아침 '
+      } else if (data.timeofday === 'lunch') {
+        sTemp += '점심 '
+      } else if (data.timeofday === 'dinner') {
+        sTemp += '저녁 '
+      } else if (data.timeofday === 'sleep') {
+        sTemp = '취침 전'
+      }
+
+      if (data.condition === 'b_meal') {
+        sTemp += '식전'
+      } else {
+        if (data.timeofday !== 'sleep')
+          sTemp += '식후'
+      }
+
+      temp.push([sTemp, data.measurement])
+    });
+
+    options.series[0].data = temp
+    // 하루엥 여러번 측정 할 가능성 농후하지 않나? 그럴 때 각 각 포지션에 대해서 그냥 기록만 해 주면 상관없는데
   }
 
-  glucoseData.forEach(gData => {
-    const mDate = new Date(gData.date).getTime();
-    const beforeMeal = getAverageGlucose(mDate, [gData.morningBeforeMeal, gData.afternoonBeforeMeal, gData.eveningBeforeMeal],
-      glucoseOption.b_meal_min, glucoseOption.b_meal_max);
-    const afterMeal = getAverageGlucose(mDate, [gData.morningAfterMeal, gData.afternoonAfterMeal, gData.eveningAfterMeal],
-      glucoseOption.a_meal_min, glucoseOption.a_meal_max);
-    const beforeSleep = getAverageGlucose(mDate, [gData.beforeSleep], glucoseOption.sleep_min, glucoseOption.sleep_max);
-    oneDayBeforeMeal.push(beforeMeal);
-    oneDayAfterMeal.push(afterMeal);
-    oneDayBeforeSleep.push(beforeSleep);
-  });
-
-  options.series[0].data = oneDayBeforeMeal;
-  options.series[1].data = oneDayAfterMeal;
-  options.series[2].data = oneDayBeforeSleep;
 
   return options;
 }

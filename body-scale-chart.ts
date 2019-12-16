@@ -5,6 +5,7 @@ import {BodyscaleMeasurement} from '@AutochekCommon/vanilla/objects/device-data-
 chartCommon(Highcharts);
 
 export function drawBodyScaleChart(canvas: string, data: BodyscaleMeasurement[], opt?: AutochekChartOption) {
+  console.log(data)
   const option = setBodyScaleOption(data, opt);
   Highcharts.chart(canvas, option);
 }
@@ -131,7 +132,6 @@ function setBodyScaleOption(bodyScaleData: BodyscaleMeasurement[], opt?: Autoche
       } else if (opt.bodyScale === 'bone') {
         options.series[0].name = '뼈/무기질';
         options.title.text = "뼈/무기질";
-        multiplier = 0.1;
       } else if (opt.bodyScale === 'bmi') {
         options.chart.type = 'line';
         options.series[0].name = '체질량 지수';
