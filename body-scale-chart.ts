@@ -1,14 +1,8 @@
 import * as Highcharts from 'highcharts';
-import Boost from 'highcharts/modules/boost';
-import noData from 'highcharts/modules/no-data-to-display';
-import More from 'highcharts/highcharts-more';
 import {AutochekChartOption, chartCommon} from './chart.option';
 import {BodyscaleMeasurement} from '@AutochekCommon/vanilla/objects/device-data-object';
 
-Boost(Highcharts);
-noData(Highcharts);
-More(Highcharts);
-chartCommon();
+chartCommon(Highcharts);
 
 export function drawBodyScaleChart(canvas: string, data: BodyscaleMeasurement[], opt?: AutochekChartOption) {
   const option = setBodyScaleOption(data, opt);
@@ -19,7 +13,7 @@ const options: any = {
   title: {
     text: '체성분 차트'
   },
-  chart:{
+  chart: {
     type: 'column'
   },
   credits: {
@@ -78,6 +72,7 @@ function setBodyScaleOption(bodyScaleData: BodyscaleMeasurement[], opt?: Autoche
   if (opt && opt.end) {
     options.xAxis.max = opt.end.getTime()
   }
+
   switch (selection) {
     case 'weight':
       options.series = [{
@@ -118,6 +113,7 @@ function setBodyScaleOption(bodyScaleData: BodyscaleMeasurement[], opt?: Autoche
       options.series[2].data = muscle;
       options.series[3].data = fat;
       break;
+
     default:
       options.series = [{
         name: '',
@@ -130,11 +126,11 @@ function setBodyScaleOption(bodyScaleData: BodyscaleMeasurement[], opt?: Autoche
       } else if (opt.bodyScale === 'visceral') {
         options.chart.type = 'line';
         options.series[0].name = '복부지방량';
-        options.title.text = "복부지방량"
+        options.title.text = "복부지방량";
         multiplier = 0.1;
       } else if (opt.bodyScale === 'bone') {
         options.series[0].name = '뼈/무기질';
-        options.title.text = "뼈/무기질"
+        options.title.text = "뼈/무기질";
         multiplier = 0.1;
       } else if (opt.bodyScale === 'bmi') {
         options.chart.type = 'line';
@@ -145,14 +141,8 @@ function setBodyScaleOption(bodyScaleData: BodyscaleMeasurement[], opt?: Autoche
         const dateAndTime = data.date.getTime();
         tempArray.push([dateAndTime, data[`${opt.bodyScale}`] * multiplier]);
       });
-      // bmr: number,  //1487 -> 1487kcal 기초 대사량
-      //   visceral: number, // 47 -> 4.7% 복부지방
-      // bone: number, // 28 -> 2.8kg 뼈/무기질
-      // bmi: number 체질량 지수
       options.series[0].data = tempArray;
       break;
   }
-
-
   return options;
 }

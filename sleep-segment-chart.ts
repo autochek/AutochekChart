@@ -1,17 +1,10 @@
 import {PedometerSleepSegment, PedometerSleepSummary} from '@AutochekCommon/vanilla/objects/device-data-object';
 import {AutochekChartOption, chartCommon} from './chart.option';
-
 import * as Highcharts from 'highcharts';
-import Boost from 'highcharts/modules/boost';
-import noData from 'highcharts/modules/no-data-to-display';
-import More from 'highcharts/highcharts-more';
 import Xrange from 'highcharts/modules/xrange';
 
 Xrange(Highcharts);
-Boost(Highcharts);
-noData(Highcharts);
-More(Highcharts);
-chartCommon();
+chartCommon(Highcharts);
 
 export function drawSleepChart(canvas: string, data: PedometerSleepSegment[] | PedometerSleepSummary[], opt?: AutochekChartOption) {
   setSleepSegmentOption(data).then(
@@ -144,26 +137,26 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | Pedome
   return option;
 }
 
-async function makeSleepData(index: number, startTime: number, endTime: number, notInSleep, shallowSleep, deepSleep) {
+async function makeSleepData(index: number, startTime: number, thisTime: number, notInSleep, shallowSleep, deepSleep) {
   switch (index) {
     case 3:
       notInSleep.push({
         x: startTime,
-        x2: endTime,
+        x2: thisTime,
         y: 0
       });
       break;
     case 2:
       shallowSleep.push({
         x: startTime,
-        x2: endTime,
+        x2: thisTime,
         y: 0
       });
       break;
     case 1:
       deepSleep.push({
         x: startTime,
-        x2: endTime,
+        x2: thisTime,
         y: 0
       });
       break;

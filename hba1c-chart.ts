@@ -1,14 +1,8 @@
 import * as Highcharts from 'highcharts';
-import Boost from 'highcharts/modules/boost';
-import noData from 'highcharts/modules/no-data-to-display';
-import More from 'highcharts/highcharts-more';
 import {HbA1C} from '@AutochekCommon/vanilla/objects/device-data-object';
 import {chartCommon} from '@AutochekChart/chart.option';
 
-Boost(Highcharts);
-noData(Highcharts);
-More(Highcharts);
-chartCommon();
+chartCommon(Highcharts);
 
 export function drawHbA1CChart(canvas: string, data: HbA1C[]) {
   const option = setHbA1COption(data);

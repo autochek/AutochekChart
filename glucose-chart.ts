@@ -1,18 +1,8 @@
-import MomentTimeZone from 'moment-timezone';
 import * as Highcharts from 'highcharts';
-import Boost from 'highcharts/modules/boost';
-import noData from 'highcharts/modules/no-data-to-display';
-import More from 'highcharts/highcharts-more';
 import {GlucosemeterDaySummary, GlucosemeterMeasurement} from '@AutochekCommon/vanilla/objects/device-data-object';
 import {AutochekChartOption, chartCommon, GlucoseOption} from './chart.option';
 
-// window['moment'] = moment;
-MomentTimeZone();
-
-Boost(Highcharts);
-noData(Highcharts);
-More(Highcharts);
-chartCommon()
+chartCommon(Highcharts);
 
 export function drawGlucoseChart(canvas: string, data: GlucosemeterMeasurement[] | GlucosemeterDaySummary[], opt?: AutochekChartOption) {
   let chartOption = {};

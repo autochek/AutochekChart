@@ -1,19 +1,9 @@
 import * as moment from 'moment';
-import MomentTimeZone from 'moment-timezone';
 import * as Highcharts from 'highcharts';
-import Boost from 'highcharts/modules/boost';
-import noData from 'highcharts/modules/no-data-to-display';
-import More from 'highcharts/highcharts-more';
 import {PedometerDaySummary, PedometerTimeSegment} from '@AutochekCommon/vanilla/objects/device-data-object';
 import {AutochekChartOption, chartCommon} from './chart.option';
 
-window['moment'] = moment;
-MomentTimeZone();
-
-Boost(Highcharts);
-noData(Highcharts);
-More(Highcharts);
-chartCommon();
+chartCommon(Highcharts);
 
 export function drawPedometerChart(canvas: string, data: PedometerTimeSegment[] | PedometerDaySummary[], opt?: AutochekChartOption) {
   document.getElementById(canvas).innerHTML = '';

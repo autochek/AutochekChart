@@ -1,4 +1,9 @@
 import * as Highcharts from 'highcharts';
+import Boost from "highcharts/modules/boost";
+import noData from "highcharts/modules/no-data-to-display";
+import More from "highcharts/highcharts-more";
+import * as moment from "moment";
+import MomentTimeZone from "moment-timezone"
 
 export interface AutochekChartOption {
   start?: Date;
@@ -19,7 +24,14 @@ export interface GlucoseOption {
   sleep_max?: number;
 }
 
-export function chartCommon() {
+export function chartCommon(Highchart: any) {
+  window['moment'] = moment;
+  MomentTimeZone();
+
+  Boost(Highchart);
+  noData(Highchart);
+  More(Highchart);
+
   Highcharts.setOptions({
     lang: {
       months: [

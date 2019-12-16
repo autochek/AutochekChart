@@ -1,20 +1,9 @@
 import * as moment from 'moment';
-import MomentTimeZone from 'moment-timezone';
 import {PedometerHeartrateSegment} from '@AutochekCommon/vanilla/objects/device-data-object';
-
 import * as Highcharts from 'highcharts';
-import Boost from 'highcharts/modules/boost';
-import noData from 'highcharts/modules/no-data-to-display';
-import More from 'highcharts/highcharts-more';
 import {chartCommon} from '@AutochekChart/chart.option';
 
-window['moment'] = moment;
-MomentTimeZone();
-
-Boost(Highcharts);
-noData(Highcharts);
-More(Highcharts);
-chartCommon();
+chartCommon(Highcharts);
 
 export async function drawHeartRateChart(canvas: string, data: PedometerHeartrateSegment[]) {
   const option = await setHeartRateChartOption(data);

@@ -1,14 +1,8 @@
 import * as Highcharts from 'highcharts';
-import Boost from 'highcharts/modules/boost';
-import noData from 'highcharts/modules/no-data-to-display';
-import More from 'highcharts/highcharts-more';
 import {BloodpressureMeasurement} from '@AutochekCommon/vanilla/objects/device-data-object';
 import {AutochekChartOption, chartCommon} from './chart.option';
 
-Boost(Highcharts);
-noData(Highcharts);
-More(Highcharts);
-chartCommon();
+chartCommon(Highcharts);
 
 export function drawBloodpressurePeriodChart(canvas: string, data: BloodpressureMeasurement[], opt?: AutochekChartOption) {
   const option = setBloodPressureOption(data, opt);
@@ -101,15 +95,15 @@ function setBloodPressureOption(bpData: BloodpressureMeasurement[], opt?: Autoch
   const updatedRate = [];
 
   bpData.forEach(data => {
-    const time = new Date(data.date).getTime();
+    const thisTime = new Date(data.date).getTime();
     const tempSystolic = [
-      time, data.diastolic, data.systolic
+      thisTime, data.diastolic, data.systolic
     ];
     const tempAverage = [
-      time, data.mean
+      thisTime, data.mean
     ];
     const tempRate = [
-      time, data.rate
+      thisTime, data.rate
     ];
     updatedSystolic.push(tempSystolic);
     updatedAverage.push(tempAverage);
