@@ -13,7 +13,7 @@ export async function drawHeartRateChart(canvas: string, data: PedometerHeartrat
 async function setHeartRateChartOption(heartRateData: PedometerHeartrateSegment[]) {
   const options: any = {
     title: {
-      text: 'Heart Rate Chart'
+      text: '심박수 차트 (횟수/1m)'
     },
     time: {
       timezone: 'Asia/Seoul'
@@ -24,8 +24,7 @@ async function setHeartRateChartOption(heartRateData: PedometerHeartrateSegment[
     },
     yAxis: {
       title: {
-        text: 'BPM(심박수/1분)',
-        rotation: '270'
+        text: '',
       },
       labels: {
         format: '{value}',
@@ -36,7 +35,8 @@ async function setHeartRateChartOption(heartRateData: PedometerHeartrateSegment[
         animation: false,
         marker: {
           enabled: false
-        }
+        },
+        enableMouseTracking: false
       }
     },
     series: [{

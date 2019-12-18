@@ -1,6 +1,6 @@
 import * as Highcharts from 'highcharts';
 import {GlucosemeterDaySummary, GlucosemeterMeasurement} from '@AutochekCommon/vanilla/objects/device-data-object';
-import {AutochekChartOption, chartCommon, GlucoseOption} from './chart.option';
+import {AutochekChartOption, chartCommon} from './chart.option';
 
 chartCommon(Highcharts);
 
@@ -93,25 +93,16 @@ function setGlucoseChartOption(glucoseData: GlucosemeterDaySummary[] | Glucoseme
       lineWidth: 0.5
     }];
 
+    options.title.text = '일평균 혈당 차트';
     options.xAxis.type = 'datetime';
     options.xAxis.categories = undefined;
-    options.xAxis.max = undefined
-    options.xAxis.min = undefined
+    options.xAxis.max = undefined;
+    options.xAxis.min = undefined;
 
     const oneDayBeforeMeal = [];
     const oneDayAfterMeal = [];
     const oneDayBeforeSleep = [];
 
-    if (!opt && !opt.glucose) { // option is optional, but require on drawing. So make default value
-      opt.glucose = {
-        b_meal_min: 80,
-        b_meal_max: 130,
-        a_meal_min: 100,
-        a_meal_max: 200,
-        sleep_min: 90,
-        sleep_max: 140
-      };
-    }
 
     glucoseData.forEach(gData => {
       const mDate = new Date(gData.date).getTime();
@@ -128,8 +119,22 @@ function setGlucoseChartOption(glucoseData: GlucosemeterDaySummary[] | Glucoseme
     options.series[0].data = oneDayBeforeMeal;
     options.series[1].data = oneDayAfterMeal;
     options.series[2].data = oneDayBeforeSleep;
+    if (opt.glucoseChart) {
+      if (opt.glucoseChart === 'beforeMeal') {
+        options.title.text = '식전 혈당 차트';
+        options.series = [options.series[0]];
+      } else if (opt.glucoseChart === 'afterMeal') {
+        options.title.text = '식후 혈당 차트';
+        options.series = [options.series[1]];
+      } else if (opt.glucoseChart === 'beforeSleep') {
+        console.log('이게 돌아가???');
+        options.title.text = '취침 전 혈당 차트';
+        options.series = [options.series[2]];
+      }
+    }
+
   } else {
-    options.xAxis.type = 'category'
+    options.xAxis.type = 'category';
     options.xAxis.categories = ['아침 식전', '아침 식후', '점심 식전', '점심 식후', '저녁 식전', '저녁 식후', '취침 전'];
     options.xAxis.min = 0;
     options.xAxis.max = 6;
@@ -144,31 +149,32 @@ function setGlucoseChartOption(glucoseData: GlucosemeterDaySummary[] | Glucoseme
     glucoseData.forEach(data => {
       let sTemp = '';
       if (data.timeofday === 'breakfast') {
-        sTemp += '아침 '
+        sTemp += '아침 ';
       } else if (data.timeofday === 'lunch') {
-        sTemp += '점심 '
+        sTemp += '점심 ';
       } else if (data.timeofday === 'dinner') {
-        sTemp += '저녁 '
+        sTemp += '저녁 ';
       } else if (data.timeofday === 'sleep') {
-        sTemp = '취침 전'
+        sTemp = '취침 전';
       }
 
       if (data.condition === 'b_meal') {
-        sTemp += '식전'
+        sTemp += '식전';
       } else {
-        if (data.timeofday !== 'sleep')
-          sTemp += '식후'
+        if (data.timeofday !== 'sleep') {
+          sTemp += '식후';
+        }
       }
       const pushData = [sTemp, data.measurement];
-      pushToOptionSeries(pushData, options, 0)
+      pushToOptionSeries(pushData, options, 0);
     });
   }
 
   if (opt && opt.start) {
-    options.xAxis.min = opt.start.getTime()
+    options.xAxis.min = opt.start.getTime();
   }
   if (opt && opt.end) {
-    options.xAxis.max = opt.end.getTime()
+    options.xAxis.max = opt.end.getTime();
   }
 
   return options;
@@ -181,7 +187,7 @@ function getAverageGlucose(time, glucoseList, min?, max?) {
     x: time,
     y: 0,
     marker: {
-      enabled: false,
+      enabled: true,
       fillColor: undefined
     }
   };
@@ -206,11 +212,11 @@ function pushToOptionSeries(data, list, i) {
   let hasSameCategory = false;
   list.series[i].data.forEach(el => {
     if (el[0] === data[0]) {
-      hasSameCategory = true
+      hasSameCategory = true;
     }
   });
   if (!hasSameCategory) {
-    list.series[i].data.push(data)
+    list.series[i].data.push(data);
   } else {
     list.series.push({
       type: 'column',
@@ -219,6 +225,6 @@ function pushToOptionSeries(data, list, i) {
       opacity: 0.8,
       borderWidth: 3
     });
-    pushToOptionSeries(data, list, i + 1)
+    pushToOptionSeries(data, list, i + 1);
   }
 }

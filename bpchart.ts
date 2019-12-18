@@ -12,7 +12,7 @@ export function drawBloodpressurePeriodChart(canvas: string, data: Bloodpressure
 function setBloodPressureOption(bpData: BloodpressureMeasurement[], opt?: AutochekChartOption) {
   const options: any = {
     title: {
-      text: 'Blood Pressure chart'
+      text: '혈압 차트'
     },
     credits: {
       enabled: false

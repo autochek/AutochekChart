@@ -1,9 +1,9 @@
 import * as Highcharts from 'highcharts';
-import Boost from "highcharts/modules/boost";
-import noData from "highcharts/modules/no-data-to-display";
-import More from "highcharts/highcharts-more";
-import * as moment from "moment";
-import MomentTimeZone from "moment-timezone"
+import Boost from 'highcharts/modules/boost';
+import noData from 'highcharts/modules/no-data-to-display';
+import More from 'highcharts/highcharts-more';
+import * as moment from 'moment';
+import MomentTimeZone from 'moment-timezone';
 
 export interface AutochekChartOption {
   start?: Date;
@@ -12,6 +12,7 @@ export interface AutochekChartOption {
   max?: number;
 
   bodyScale?: string;
+  glucoseChart?: string;
   glucose?: GlucoseOption;
 }
 
