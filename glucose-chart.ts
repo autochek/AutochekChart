@@ -1,5 +1,5 @@
 import * as Highcharts from 'highcharts';
-import {GlucosemeterDaySummary, GlucosemeterMeasurement} from '@AutochekCommon/vanilla/objects/device-data-object';
+import {GlucosemeterDaySummary, GlucosemeterMeasurement} from 'autochek-base/objects/device-data-object';
 import {AutochekChartOption, chartCommon} from './chart.option';
 
 chartCommon(Highcharts);

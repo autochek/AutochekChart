@@ -1,6 +1,6 @@
 import * as moment from 'moment';
 import * as Highcharts from 'highcharts';
-import {PedometerDaySummary, PedometerTimeSegment} from '@AutochekCommon/vanilla/objects/device-data-object';
+import {PedometerDaySummary, PedometerTimeSegment} from 'autochek-base/objects/device-data-object';
 import {AutochekChartOption, chartCommon} from './chart.option';
 
 chartCommon(Highcharts);

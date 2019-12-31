@@ -1,5 +1,5 @@
 import * as Highcharts from 'highcharts';
-import {BloodpressureMeasurement} from '@AutochekCommon/vanilla/objects/device-data-object';
+import {BloodpressureMeasurement} from 'autochek-base/objects/device-data-object';
 import {AutochekChartOption, chartCommon} from './chart.option';
 
 chartCommon(Highcharts);

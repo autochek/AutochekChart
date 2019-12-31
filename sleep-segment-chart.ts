@@ -1,4 +1,4 @@
-import {PedometerSleepSegment, PedometerSleepSummary} from '@AutochekCommon/vanilla/objects/device-data-object';
+import {PedometerSleepSegment, PedometerSleepSummary} from 'autochek-base/objects/device-data-object';
 import {AutochekChartOption, chartCommon} from './chart.option';
 import * as Highcharts from 'highcharts';
 import Xrange from 'highcharts/modules/xrange';

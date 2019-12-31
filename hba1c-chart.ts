@@ -1,5 +1,5 @@
 import * as Highcharts from 'highcharts';
-import {HbA1C} from '@AutochekCommon/vanilla/objects/device-data-object';
+import {HbA1C} from 'autochek-base/objects/device-data-object';
 import {chartCommon} from '@AutochekChart/chart.option';
 
 chartCommon(Highcharts);

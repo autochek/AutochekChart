@@ -1,6 +1,6 @@
 import * as Highcharts from 'highcharts';
 import {AutochekChartOption, chartCommon} from './chart.option';
-import {BodyscaleMeasurement} from '@AutochekCommon/vanilla/objects/device-data-object';
+import {BodyscaleMeasurement} from 'autochek-base/objects/device-data-object';
 
 chartCommon(Highcharts);
 
