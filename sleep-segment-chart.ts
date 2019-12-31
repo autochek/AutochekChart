@@ -30,7 +30,6 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | Pedome
     },
     yAxis: {
       categories: ['수면패턴'],
-      reversed: true,
       visible: false
     },
     plotOptions: {
@@ -45,7 +44,11 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | Pedome
         }
       },
       column: {
-        stacking: 'normal'
+        stacking: 'normal',
+        grouping: true,
+        pointWidth: null,
+        pointPadding: 0.1,
+        groupPadding: 0.3,
       },
       series: {
         marker: {
@@ -111,29 +114,56 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | Pedome
     option.series[1].data = shallowSleep;
     option.series[2].data = deepSleep;
   } else { // Data is of type PedometerSleepSummary
-    option.series = [
-      {
-        name: '얕은잠',
-        data: [],
-        color: '#bcc5fa',
+    option.chart.type = 'column';
+    option.xAxis = {
+      type: 'datetime',
+      minTickInterval: 24 * 3600 * 1000,
+      units: [['day', [1]]],
+      minPadding: 0.1,
+      maxPadding: 0.1
+    };
+    option.yAxis = {
+      visible: true,
+      title: '',
+      labels: {
+        formatter() {
+          const hour = Math.floor(this.value / 60);
+          let min: any = this.value % 60;
+          if (min === 0) {
+            min = '00';
+          }
+          return hour + ':' + min;
+        }
+      }
+    },
+      option.series = [
+        {
+          name: '얕은잠',
+          data: [],
+          color: '#bcc5fa',
+        },
+        {
+          name: '깊은잠',
+          data: [],
+          color: '#8191f5'
+        }];
+    option.tooltip = {
+      pointFormatter() {
+        const hour = Math.floor(this.y / 60);
+        const min = this.y % 60;
+        return '<span>' + this.series.name + ': ' + hour + '시간 ' + min + '분<br></span>';
       },
-      {
-        name: '깊은잠',
-        data: [],
-        color: '#8191f5'
-      }];
+      shared: true
+    };
     sleepData.forEach(data => {
       const thatDay = new Date(data.date).getTime();
-      deepSleep.push(thatDay, data.deepSleep);
-      shallowSleep.push(thatDay, data.lightSleep);
+      deepSleep.push([thatDay, data.deepSleep]);
+      shallowSleep.push([thatDay, data.lightSleep]);
     });
 
     option.series[0].data = shallowSleep;
     option.series[1].data = deepSleep;
-
-    option.chart.type = 'column';
   }
-
   return option;
 }
 
