@@ -1,5 +1,5 @@
-import {PedometerSleepSegment, PedometerSleepSummary} from 'autochek-base/objects/device-data-object';
-import {AutochekChartOption, chartCommon} from './chart.option';
+import { PedometerSleepSegment, PedometerSleepSummary } from 'autochek-base/objects/device-data-object';
+import { AutochekChartOption, chartCommon } from './chart.option';
 import * as Highcharts from 'highcharts';
 import Xrange from 'highcharts/modules/xrange';
 
@@ -90,7 +90,7 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | Pedome
       if (i !== (sleepData.length - 1)) {
         if (bool) {
           endTime = new Date(sData.date).getTime();
-          await makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
+          makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
 
           startTime = new Date(sData.date).getTime();
           flag = sData.sleepIndex;
@@ -98,14 +98,14 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | Pedome
       } else {
         if (!bool) {
           endTime = new Date(sData.date).getTime() + 300 * 1000;
-          await makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
+          makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
         } else {
           endTime = new Date(sData.date).getTime();
-          await makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
+          makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
           startTime = endTime;
           endTime = new Date(sData.date).getTime() + 300 * 1000;
           flag = sData.sleepIndex;
-          await makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
+          makeSleepData(flag, startTime, endTime, notInSleep, shallowSleep, deepSleep);
         }
       }
     }
@@ -167,7 +167,7 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | Pedome
   return option;
 }
 
-async function makeSleepData(index: number, startTime: number, thisTime: number, notInSleep, shallowSleep, deepSleep) {
+function makeSleepData(index: number, startTime: number, thisTime: number, notInSleep, shallowSleep, deepSleep) {
   switch (index) {
     case 3:
       notInSleep.push({
