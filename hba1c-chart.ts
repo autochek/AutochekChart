@@ -19,7 +19,8 @@ function setHbA1COption(hbA1CData: HbA1C[]) {
       enabled: false
     },
     tooltip: {
-      shared: true
+      shared: true,
+      xDateFormat: '%m월 %d',
     },
     time: {
       timezone: 'Asia/Seoul'
