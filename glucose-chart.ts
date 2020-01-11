@@ -5,7 +5,7 @@ import * as moment from 'moment';
 
 chartCommon(Highcharts);
 
-export function drawGlucoseChart(canvas: string, data: GlucosemeterMeasurement[], opt?: AutochekChartOption) {
+export function drawGlucoseChart(canvas: string, data: GlucosemeterMeasurement[] | GlucosemeterDaySummary[], opt?: AutochekChartOption) {
   let chartOption = {};
   let reforgedData: GlucosemeterDaySummary[] | GlucosemeterMeasurement[];
 
@@ -171,36 +171,68 @@ function setGlucoseChartOption(glucoseData: GlucosemeterDaySummary[] | Glucoseme
     if (glucoseData[0] instanceof GlucosemeterDaySummary) {
       options.series = [{
         name: '식사 전 일평균',
-        type: 'line',
-        color: '#dddddd',
-        data: [],
-        lineWidth: 2.3
-      }, {
-        name: '식사 후 일평균',
-        type: 'line',
-        color: '#888888',
+        type: 'scatter',
         data: []
       }, {
-        name: '취침 전',
+        name: '평균 선 그래프',
         type: 'line',
-        color: '#111111',
-        data: [],
-        lineWidth: 0.5
+        color: '#444444',
+        data: []
       }];
+      options.xAxis.dateTimeLabelFormats = {
+        minute: '%H:%M',
+        hour: '%H:%M',
+        day: '%b월 %e일'
+      };
 
-      options.title.text = '일평균 혈당 차트';
       options.xAxis.type = 'datetime';
       options.xAxis.categories = undefined;
-      options.xAxis.max = undefined;
-      options.xAxis.min = undefined;
+
+      options.xAxis.max = opt.end.getTime();;
+      options.xAxis.min = opt.start.getTime();;
+
+      console.log(options.xAxis.max)
+      console.log(options.xAxis.min)
+      options.tooltip = {
+        formatter: function() {
+          return '<br>' + Highcharts.dateFormat('%b월 %e일', this.point.x) + '</br> <br>' + this.series.name + ': ' + this.y + 'mg/gL </br>';
+        }
+      }
+
 
       const oneDayBeforeMeal = [];
       const oneDayAfterMeal = [];
       const oneDayBeforeSleep = [];
 
+      const beforeMealArray = [];
+      const afterMealArray = [];
+      const beforeSleepArray = [];
 
       glucoseData.forEach(gData => {
-        const mDate = new Date(gData.date).getTime();
+        // const mDate = new Date(gData.date).getTime();
+        const mDate = moment(gData.date).startOf('day').valueOf();
+        if (gData.morningBeforeMeal) {
+          beforeMealArray.push([mDate, gData.morningBeforeMeal]);
+        }
+        if (gData.afternoonBeforeMeal) {
+          beforeMealArray.push([mDate, gData.afternoonBeforeMeal]);
+        }
+        if (gData.eveningBeforeMeal) {
+          beforeMealArray.push([mDate, gData.eveningBeforeMeal]);
+        }
+        if (gData.morningAfterMeal) {
+          afterMealArray.push(([mDate, gData.morningAfterMeal]));
+        }
+        if (gData.afternoonAfterMeal) {
+          afterMealArray.push([mDate, gData.afternoonAfterMeal]);
+        }
+        if (gData.eveningAfterMeal) {
+          afterMealArray.push([mDate, gData.eveningAfterMeal]);
+        }
+        if (gData.beforeSleep) {
+          beforeSleepArray.push([mDate, gData.beforeSleep]);
+        }
+
         const beforeMeal = getAverageGlucose(mDate, [gData.morningBeforeMeal, gData.afternoonBeforeMeal, gData.eveningBeforeMeal],
           opt.glucose.b_meal_min, opt.glucose.b_meal_max);
         const afterMeal = getAverageGlucose(mDate, [gData.morningAfterMeal, gData.afternoonAfterMeal, gData.eveningAfterMeal],
@@ -211,67 +243,69 @@ function setGlucoseChartOption(glucoseData: GlucosemeterDaySummary[] | Glucoseme
         oneDayBeforeSleep.push(beforeSleep);
       });
 
-      options.series[0].data = oneDayBeforeMeal;
-      options.series[1].data = oneDayAfterMeal;
-      options.series[2].data = oneDayBeforeSleep;
+      // options.series[0].data = oneDayBeforeMeal;
+      // options.series[1].data = oneDayAfterMeal;
+      // options.series[2].data = oneDayBeforeSleep;
       if (opt.glucoseChart) {
         if (opt.glucoseChart === 'beforeMeal') {
           options.title.text = '식전 혈당 차트';
-          options.series = [options.series[0]];
+          options.series[0].data = beforeMealArray;
+          options.series[1].data = oneDayBeforeMeal;
         } else if (opt.glucoseChart === 'afterMeal') {
           options.title.text = '식후 혈당 차트';
-          options.series = [options.series[1]];
+          options.series[0].data = afterMealArray;
+          options.series[1].data = oneDayAfterMeal;
         } else if (opt.glucoseChart === 'beforeSleep') {
-          console.log('이게 돌아가???');
           options.title.text = '취침 전 혈당 차트';
-          options.series = [options.series[2]];
+          options.series[0].data = beforeSleepArray;
+          options.series[1].data = oneDayBeforeSleep;
         }
       }
-
-    } else {
-      // 하루 조회 일 때
-      options.xAxis.type = 'category';
-      options.xAxis.categories = ['아침 식전', '아침 식후', '점심 식전', '점심 식후', '저녁 식전', '저녁 식후', '취침 전'];
-      options.xAxis.min = 0;
-      options.xAxis.max = 6;
-
-      options.series = [{
-        type: 'column',
-        name: '혈당',
-        data: [],
-        opacity: 0.8,
-        borderWidth: 3
-      }];
-      glucoseData.forEach(data => {
-        let sTemp = '';
-        if (data.timeofday === 'breakfast') {
-          sTemp += '아침 ';
-        } else if (data.timeofday === 'lunch') {
-          sTemp += '점심 ';
-        } else if (data.timeofday === 'dinner') {
-          sTemp += '저녁 ';
-        } else if (data.timeofday === 'sleep') {
-          sTemp = '취침 전';
-        }
-
-        if (data.condition === 'b_meal') {
-          sTemp += '식전';
-        } else {
-          if (data.timeofday !== 'sleep') {
-            sTemp += '식후';
-          }
-        }
-        const pushData = [sTemp, data.measurement];
-        pushToOptionSeries(pushData, options, 0);
-      });
     }
+    // } else {
+    //   // 하루 조회 일 때
+    //   options.xAxis.type = 'category';
+    //   options.xAxis.categories = ['아침 식전', '아침 식후', '점심 식전', '점심 식후', '저녁 식전', '저녁 식후', '취침 전'];
+    //   options.xAxis.min = 0;
+    //   options.xAxis.max = 6;
+    //
+    //   options.series = [{
+    //     type: 'column',
+    //     name: '혈당',
+    //     data: [],
+    //     opacity: 0.8,
+    //     borderWidth: 3
+    //   }];
+    //   glucoseData.forEach(data => {
+    //     let sTemp = '';
+    //     if (data.timeofday === 'breakfast') {
+    //       sTemp += '아침 ';
+    //     } else if (data.timeofday === 'lunch') {
+    //       sTemp += '점심 ';
+    //     } else if (data.timeofday === 'dinner') {
+    //       sTemp += '저녁 ';
+    //     } else if (data.timeofday === 'sleep') {
+    //       sTemp = '취침 전';
+    //     }
+    //
+    //     if (data.condition === 'b_meal') {
+    //       sTemp += '식전';
+    //     } else {
+    //       if (data.timeofday !== 'sleep') {
+    //         sTemp += '식후';
+    //       }
+    //     }
+    //     const pushData = [sTemp, data.measurement];
+    //     pushToOptionSeries(pushData, options, 0);
+    //   });
+    // }
 
-    if (opt && opt.start) {
-      options.xAxis.min = opt.start.getTime();
-    }
-    if (opt && opt.end) {
-      options.xAxis.max = opt.end.getTime();
-    }
+    // if (opt && opt.start) {
+    //   options.xAxis.min = opt.start.getTime();
+    // }
+    // if (opt && opt.end) {
+    //   options.xAxis.max = opt.end.getTime();
+    // }
   }
   return options;
 }
