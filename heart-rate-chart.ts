@@ -1,7 +1,7 @@
 import * as moment from 'moment';
-import {PedometerHeartrateSegment} from 'autochek-base/objects/device-data-object';
+import { PedometerHeartrateSegment } from 'autochek-base/objects/device-data-object';
 import * as Highcharts from 'highcharts';
-import {chartCommon} from '@AutochekChart/chart.option';
+import { chartCommon } from '@AutochekChart/chart.option';
 
 chartCommon(Highcharts);
 
@@ -41,7 +41,14 @@ async function setHeartRateChartOption(heartRateData: PedometerHeartrateSegment[
         marker: {
           enabled: false
         },
-        enableMouseTracking: false
+        enableMouseTracking: false,
+        stickyTracking: false,
+        shadow: false,
+        dataLabels: {
+          style: {
+            textShadow: false
+          }
+        }
       }
     },
     series: [{
@@ -91,16 +98,27 @@ function setOption(heartRateData: PedometerHeartrateSegment[]) {
     },
     plotOptions: {
       series: {
-        animation: false,
-        marker: {
-          enabled: false
-        },
         groupPadding: 0,
         pointPadding: 0,
         minPointLength: 6,
         borderRadius: 2,
-        enableMouseTracking: true
+        animation: false,
+        marker: {
+          enabled: false
+        },
+        enableMouseTracking: false,
+        stickyTracking: false,
+        shadow: false,
+        dataLabels: {
+          style: {
+            textShadow: false
+          }
+        }
       }
+    },
+    tooltip: {
+      enabled: false,
+      animation: false
     },
     series: [{
       name: '심박수',
