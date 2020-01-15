@@ -1,6 +1,6 @@
 import * as Highcharts from 'highcharts';
-import { GlucosemeterDaySummary, GlucosemeterMeasurement } from 'autochek-base/objects/device-data-object';
-import { AutochekChartOption, chartCommon } from './chart.option';
+import {GlucosemeterDaySummary, GlucosemeterMeasurement} from 'autochek-base/objects/device-data-object';
+import {AutochekChartOption, chartCommon} from './chart.option';
 import * as moment from 'moment';
 
 chartCommon(Highcharts);
@@ -136,7 +136,7 @@ function setGlucoseChartOption(glucoseData: GlucosemeterDaySummary[] | Glucoseme
       // zoomType: 'xy'
     };
     options.tooltip = {
-      formatter: function() {
+      formatter() {
         return '<br>' + this.point.tData + '</br> <br>' + this.series.name + ': ' + this.y + 'mg/gL </br>';
       }
     };
@@ -188,16 +188,18 @@ function setGlucoseChartOption(glucoseData: GlucosemeterDaySummary[] | Glucoseme
       options.xAxis.type = 'datetime';
       options.xAxis.categories = undefined;
 
-      options.xAxis.max = opt.end.getTime();;
-      options.xAxis.min = opt.start.getTime();;
+      if (opt && opt.min) {
+        options.xAxis.min = opt.start.getTime();
+      }
+      if (opt && opt.max) {
+        options.xAxis.max = opt.end.getTime();
+      }
 
-      console.log(options.xAxis.max)
-      console.log(options.xAxis.min)
       options.tooltip = {
-        formatter: function() {
+        formatter() {
           return '<br>' + Highcharts.dateFormat('%b월 %e일', this.point.x) + '</br> <br>' + this.series.name + ': ' + this.y + 'mg/gL </br>';
         }
-      }
+      };
 
 
       const oneDayBeforeMeal = [];
@@ -246,7 +248,7 @@ function setGlucoseChartOption(glucoseData: GlucosemeterDaySummary[] | Glucoseme
       // options.series[0].data = oneDayBeforeMeal;
       // options.series[1].data = oneDayAfterMeal;
       // options.series[2].data = oneDayBeforeSleep;
-      if (opt.glucoseChart) {
+      if (opt && opt.glucoseChart) {
         if (opt.glucoseChart === 'beforeMeal') {
           options.title.text = '식전 혈당 차트';
           options.series[0].data = beforeMealArray;

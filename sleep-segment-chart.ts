@@ -39,8 +39,17 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | Pedome
         pointPadding: 0,
         groupPadding: 0,
         colorByPoint: false,
+        animation: false,
+        marker: {
+          enabled: false
+        },
+        enableMouseTracking: false,
+        stickyTracking: false,
+        shadow: false,
         dataLabels: {
-          enabled: true
+          style: {
+            textShadow: false
+          }
         }
       },
       column: {
@@ -49,10 +58,22 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | Pedome
         pointWidth: null,
         pointPadding: 0.1,
         groupPadding: 0.3,
+        animation: false,
+        marker: {
+          enabled: false
+        },
+        enableMouseTracking: false,
+        stickyTracking: false,
+        shadow: false,
+        dataLabels: {
+          style: {
+            textShadow: false
+          }
+        }
       },
       series: {
         marker: {
-          enabled: true
+          enabled: false
         }
       }
     },
