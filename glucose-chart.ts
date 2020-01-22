@@ -94,6 +94,7 @@ const options: any = {
   },
   plotOptions: {
     series: {
+      stickyTracking: false,
       showInLegend: true,
       marker: {
         enabled: true
@@ -182,7 +183,8 @@ function setGlucoseChartOption(glucoseData: GlucosemeterDaySummary[] | Glucoseme
       options.xAxis.dateTimeLabelFormats = {
         minute: '%H:%M',
         hour: '%H:%M',
-        day: '%b월 %e일'
+        day: '%b월 %e일',
+        month: '%b월 %e일'
       };
 
       options.xAxis.type = 'datetime';
@@ -302,12 +304,12 @@ function setGlucoseChartOption(glucoseData: GlucosemeterDaySummary[] | Glucoseme
     //   });
     // }
 
-    // if (opt && opt.start) {
-    //   options.xAxis.min = opt.start.getTime();
-    // }
-    // if (opt && opt.end) {
-    //   options.xAxis.max = opt.end.getTime();
-    // }
+    if (opt && opt.start) {
+      options.xAxis.min = opt.start.getTime();
+    }
+    if (opt && opt.end) {
+      options.xAxis.max = opt.end.getTime();
+    }
   }
   return options;
 }
