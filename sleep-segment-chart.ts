@@ -1,23 +1,26 @@
 import { PedometerSleepSegment, PedometerSleepSummary } from 'autochek-base/objects/device-data-object';
 import { AutochekChartOption, chartCommon } from './chart.option';
 import * as Highcharts from 'highcharts';
-import Xrange from 'highcharts/modules/xrange';
 
-Xrange(Highcharts);
 chartCommon(Highcharts);
 
 export function drawSleepChart(canvas: string, data: PedometerSleepSegment[] | PedometerSleepSummary[], opt?: AutochekChartOption) {
-  setSleepSegmentOption(data).then(
-    (options) => {
-      Highcharts.chart(canvas, options);
-    }
-  );
+  if (data.length > 0) {
+    setSleepSegmentOption(data).then(
+      (options) => {
+        Highcharts.chart(canvas, options);
+      }
+    );
+  } else {
+    Highcharts.chart(canvas, {});
+  }
 }
 
 async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | PedometerSleepSummary[]) {
   const option: any = {
     chart: {
-      type: 'xrange'
+      type: 'columnrange',
+      inverted: true
     },
     title: {
       text: '수면 패턴 기록'
@@ -71,6 +74,15 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | Pedome
           }
         }
       },
+      columnrange: {
+        grouping: false,
+        pointWidth: null,
+        pointPadding: 0,
+        groupPadding: 0,
+        marker: {
+          enabled: true
+        }
+      },
       series: {
         marker: {
           enabled: false
@@ -85,21 +97,42 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | Pedome
   const deepSleep = [];
 
   if (sleepData[0] instanceof PedometerSleepSegment) {
+    option.xAxis = {
+      categories: ['수면패턴'],
+      labels: {
+        enabled: false
+      }
+    };
+    option.yAxis = {
+      type: 'datetime',
+      startOnTick: false,
+      endOnTick: false,
+      title: undefined
+    };
     option.series = [{
       name: '안 잠',
+      stack: 'tasks',
       data: [],
       color: '#e5e9fd',
     },
       {
         name: '얕은잠',
+        stack: 'tasks',
         data: [],
         color: '#bcc5fa',
       },
       {
         name: '깊은잠',
+        stack: 'tasks',
         data: [],
         color: '#8191f5'
       }];
+    option.tooltip = {
+      enabled: false
+      // formatter() {
+      //   return '<b>' + Highcharts.dateFormat('%H:%M', this.point.high) + '-' + '</b> <b>' + Highcharts.dateFormat('%H:%M', this.point.low) + '</b>';
+      // }
+    };
 
     let flag: number = (sleepData[0] as PedometerSleepSegment).sleepIndex;
     let startTime: number = new Date(sleepData[0].date).getTime();
@@ -146,16 +179,7 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | Pedome
     option.yAxis = {
       visible: true,
       title: '',
-      labels: {
-        formatter() {
-          const hour = Math.floor(this.value / 60);
-          let min: any = this.value % 60;
-          if (min === 0) {
-            min = '00';
-          }
-          return hour + ':' + min;
-        }
-      }
+      labels: {}
     },
       option.series = [
         {
@@ -168,14 +192,6 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | Pedome
           data: [],
           color: '#8191f5'
         }];
-    option.tooltip = {
-      pointFormatter() {
-        const hour = Math.floor(this.y / 60);
-        const min = this.y % 60;
-        return '<span>' + this.series.name + ': ' + hour + '시간 ' + min + '분<br></span>';
-      },
-      shared: true
-    };
     sleepData.forEach(data => {
       const thatDay = new Date(data.date).getTime();
       deepSleep.push([thatDay, data.deepSleep]);
@@ -192,23 +208,23 @@ function makeSleepData(index: number, startTime: number, thisTime: number, notIn
   switch (index) {
     case 3:
       notInSleep.push({
-        x: startTime,
-        x2: thisTime,
-        y: 0
+        low: startTime,
+        high: thisTime,
+        x: 0
       });
       break;
     case 2:
       shallowSleep.push({
-        x: startTime,
-        x2: thisTime,
-        y: 0
+        low: startTime,
+        high: thisTime,
+        x: 0
       });
       break;
     case 1:
       deepSleep.push({
-        x: startTime,
-        x2: thisTime,
-        y: 0
+        low: startTime,
+        high: thisTime,
+        x: 0
       });
       break;
   }

@@ -26,8 +26,8 @@ function setBloodPressureOption(bpData: BloodpressureMeasurement[], opt?: Autoch
     xAxis: {
       type: 'datetime',
       gridLineWidth: 1,
-      startOnTick: true,
-      endOnTick: true,
+      startOnTick: false,
+      endOnTick: false,
       title: {
         text: '시간',
         enabled: false
