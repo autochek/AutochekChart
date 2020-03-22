@@ -77,7 +77,6 @@ export function drawFoodLensChart(canvas: string, data: FoodlensMeasurement[] | 
   let chartOption: any = {}
   if (data.length > 0) {
     chartOption = setFoodLensOption(data, opt)
-    console.log(chartOption)
     Highcharts.chart(canvas, chartOption)
   } else {
     Highcharts.chart(canvas, {title: {text: ''}})
