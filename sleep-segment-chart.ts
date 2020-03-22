@@ -79,6 +79,7 @@ async function setSleepSegmentOption(sleepData: PedometerSleepSegment[] | Pedome
         pointWidth: null,
         pointPadding: 0,
         groupPadding: 0,
+        animation:false,
         marker: {
           enabled: true
         }
