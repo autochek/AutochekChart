@@ -1,7 +1,7 @@
 import * as Highcharts from 'highcharts'
 import { AutochekChartOption, chartCommon } from '@AutochekChart/chart.option'
 import * as moment from 'moment'
-import { DaySummaryWithArray, FoodlensDaySummary, FoodlensMeasurement } from 'autochek-base/objects/device-data-object'
+import { FoodlensDaySummary, FoodlensMeasurement } from 'autochek-base/objects/device-data-object'
 
 chartCommon(Highcharts)
 
