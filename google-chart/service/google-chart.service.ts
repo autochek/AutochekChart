@@ -1,18 +1,19 @@
-import { Injectable } from '@angular/core';
-import { ServiceModule } from './service.module';
+import {Injectable} from '@angular/core';
+import {ServiceModule} from './service.module';
 
 declare var google: any;
 
 @Injectable({
-  providedIn: ServiceModule
+	providedIn: ServiceModule
 })
 export class GoogleChartService {
-  private google : any;
-  constructor() {
-    this.google = google;
-  }
+	private google: any;
 
-  getGoogle(){
-    return this.google;
-  }
+	constructor() {
+		this.google = google;
+	}
+
+	getGoogle() {
+		return this.google;
+	}
 }
