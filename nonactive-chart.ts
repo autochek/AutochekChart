@@ -1,5 +1,4 @@
 import * as moment from 'moment';
-import {PedometerHeartrateSegment, PedometerTimeSegment} from 'autochek-base/objects/device-data-object';
 import * as Highcharts from 'highcharts';
 import {chartCommon} from '@AutochekChart/chart.option';
 
